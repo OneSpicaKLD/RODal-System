@@ -389,55 +389,57 @@ function filterCategory() {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-    const dropdown = document.getElementById('categoryDropdown');
-    if (!dropdown) return;
-
-    const trigger = dropdown.querySelector('.dropdown-trigger');
-    const menuItems = dropdown.querySelectorAll('.dropdown-menu li');
-    const hiddenInput = document.getElementById('realCategoryInput');
     const filterForm = document.getElementById('filterForm');
-    const displaySpan = document.getElementById('selectedDisplay');
+    if (!filterForm) return;
 
-    // 1. Toggle Dropdown Open/Close
-    trigger.addEventListener('click', function (e) {
-        e.stopPropagation();
-        dropdown.classList.toggle('is-open');
-    });
+    // We find ALL modern-dropdowns (Category AND Sort)
+    const dropdowns = document.querySelectorAll('.modern-dropdown');
 
-    // 2. Handle Item Selection
-    menuItems.forEach(item => {
-        item.addEventListener('click', function () {
-            const val = this.getAttribute('data-value');
-            const text = this.innerText;
+    dropdowns.forEach(dropdown => {
+        const trigger = dropdown.querySelector('.dropdown-trigger');
+        const menuItems = dropdown.querySelectorAll('.dropdown-menu li');
+        const hiddenInput = dropdown.querySelector('input[type="hidden"]');
+        const displaySpan = dropdown.querySelector('.dropdown-trigger span');
 
-            // Update UI & Input
-            hiddenInput.value = val;
-            displaySpan.innerText = text;
+        // 1. Toggle Open/Close
+        trigger.addEventListener('click', function (e) {
+            e.stopPropagation();
 
-            // Remove active class from all and add to this one
-            menuItems.forEach(li => li.classList.remove('active'));
-            this.classList.add('active');
+            // Close other dropdowns first so they don't overlap
+            dropdowns.forEach(d => {
+                if (d !== dropdown) d.classList.remove('is-open');
+            });
 
-            // Close dropdown
-            dropdown.classList.remove('is-open');
+            dropdown.classList.toggle('is-open');
+        });
 
-            // Trigger the instant JS filter
-            filterCategory();
+        // 2. Handle Item Selection
+        menuItems.forEach(item => {
+            item.addEventListener('click', function () {
+                const val = this.getAttribute('data-value');
+                const text = this.innerText;
 
-            // OPTIONAL: Submit form if you want the URL to update for deep-linking/refreshing
-            // If you only want instant filtering without page reload, comment the line below:
-            filterForm.submit();
+                // Update UI & Hidden Input
+                hiddenInput.value = val;
+                if (displaySpan) displaySpan.innerText = text;
+
+                // Update 'active' class on list items
+                menuItems.forEach(li => li.classList.remove('active'));
+                this.classList.add('active');
+
+                // Close and Submit
+                dropdown.classList.remove('is-open');
+                filterForm.submit(); // This refreshes the page with Category + Sort + Search
+            });
         });
     });
 
-    // 3. Close dropdown if clicking anywhere else on the screen
+    // 3. Global click to close dropdowns
     window.addEventListener('click', function () {
-        dropdown.classList.remove('is-open');
+        dropdowns.forEach(d => d.classList.remove('is-open'));
     });
-
-    // 4. Run filter on initial load (in case a category is set in the URL)
-    filterCategory();
 });
+
 
 // reverse faulty transaction
 

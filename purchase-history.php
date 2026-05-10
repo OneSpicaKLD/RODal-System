@@ -92,7 +92,8 @@ $result = mysqli_query($conn, $sql);
                 <li class="active"><a href="purchase-history.php"><i class="fas fa-history"></i><span>Transactions
                             History
                         </span></a></li>
-                <li><a href="archived_products.php"><i class="fas fa-archive"></i> <span>Archived Products</span></a></li>
+                <li><a href="archived_products.php"><i class="fas fa-archive"></i> <span>Archived Products</span></a>
+                </li>
             </ul>
         </aside>
 
@@ -127,22 +128,20 @@ $result = mysqli_query($conn, $sql);
                         <!-- Notification Ends here... -->
 
                         <!-- DROPDOWN WRAPPER -->
-                        <div class="user-profile-wrapper" style="position: relative !important; display: inline-block !important; vertical-align: middle;">
+                        <div class="user-profile-wrapper"
+                            style="position: relative !important; display: inline-block !important; vertical-align: middle;">
 
-                            <div id="profileBtn" onclick="toggleProfileMenu(event)"
-                                style="cursor: pointer; 
+                            <div id="profileBtn" onclick="toggleProfileMenu(event)" style="cursor: pointer; 
                 padding: 2px; 
                 display: flex; 
                 align-items: center; 
                 justify-content: center; 
-                transition: opacity 0.2s;"
-                                onmouseover="this.style.opacity='0.8'"
-                                onmouseout="this.style.opacity='1'">
-                                <i class="fas fa-user-circle" style="font-size: 24px !important; color: #333 !important;"></i>
+                transition: opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+                                <i class="fas fa-user-circle"
+                                    style="font-size: 24px !important; color: #333 !important;"></i>
                             </div>
 
-                            <div id="profileDropdown"
-                                style="display: none; 
+                            <div id="profileDropdown" style="display: none; 
                 position: absolute !important; 
                 top: 40px !important; 
                 right: 0 !important; 
@@ -156,18 +155,19 @@ $result = mysqli_query($conn, $sql);
                 z-index: 99999 !important;
                 overflow: hidden !important;">
 
-                                <div style="padding: 12px 18px; border-bottom: 1px solid #f0f0f0; background: #fff; text-align: left !important;">
-                                    <strong style="display: block !important; color: #333 !important; font-size: 14px !important; line-height: 1.2 !important; margin: 0 !important;">
+                                <div
+                                    style="padding: 12px 18px; border-bottom: 1px solid #f0f0f0; background: #fff; text-align: left !important;">
+                                    <strong
+                                        style="display: block !important; color: #333 !important; font-size: 14px !important; line-height: 1.2 !important; margin: 0 !important;">
                                         <?php echo htmlspecialchars($_SESSION['username']); ?>
                                     </strong>
-                                    <span style="color: #888 !important; font-size: 12px !important; font-weight: normal !important;">
+                                    <span
+                                        style="color: #888 !important; font-size: 12px !important; font-weight: normal !important;">
                                         <?php echo htmlspecialchars(ucfirst($_SESSION['role'])); ?>
                                     </span>
                                 </div>
 
-                                <a href="logout.php"
-                                    onclick="confirmLogout(event)"
-                                    style="display: flex !important; 
+                                <a href="logout.php" onclick="confirmLogout(event)" style="display: flex !important; 
                   align-items: center !important; 
                   gap: 10px !important; 
                   padding: 12px 18px !important; 
@@ -178,8 +178,7 @@ $result = mysqli_query($conn, $sql);
                   justify-content: flex-start !important;
                   width: 100% !important;
                   white-space: nowrap !important;
-                  transition: background 0.2s;"
-                                    onmouseover="this.style.backgroundColor='#fff5f5'"
+                  transition: background 0.2s;" onmouseover="this.style.backgroundColor='#fff5f5'"
                                     onmouseout="this.style.backgroundColor='#ffffff'">
                                     <i class="fas fa-sign-out-alt"></i> Log Out
                                 </a>
@@ -193,7 +192,7 @@ $result = mysqli_query($conn, $sql);
                                 menu.style.display = (menu.style.display === "none" || menu.style.display === "") ? "block" : "none";
                             }
 
-                            window.addEventListener('click', function(e) {
+                            window.addEventListener('click', function (e) {
                                 var menu = document.getElementById("profileDropdown");
                                 var btn = document.getElementById("profileBtn");
                                 if (menu && menu.style.display === "block") {
@@ -203,7 +202,7 @@ $result = mysqli_query($conn, $sql);
                                 }
                             });
 
-                            window.addEventListener('keydown', function(e) {
+                            window.addEventListener('keydown', function (e) {
                                 if (e.key === "Escape") {
                                     document.getElementById("profileDropdown").style.display = "none";
                                 }
@@ -269,7 +268,8 @@ $result = mysqli_query($conn, $sql);
                         </div>
 
                         <ul class="dropdown-menu">
-                            <li data-value="all" class="<?php echo ($currentCat == 'all') ? 'active' : ''; ?>">All Categories</li>
+                            <li data-value="all" class="<?php echo ($currentCat == 'all') ? 'active' : ''; ?>">All
+                                Categories</li>
                             <?php
                             $cats = ["TOILETRIES", "BEVERAGE", "DRINK_POWDERED", "FOOD_CANNED", "FOOD_INSTANT", "FOOD_SNACK", "FOOD_INGREDIENT", "FOOD_RICE", "CLEANING_AGENTS"];
                             foreach ($cats as $cat) {
@@ -280,7 +280,8 @@ $result = mysqli_query($conn, $sql);
                             ?>
                         </ul>
 
-                        <input type="hidden" name="category" id="realCategoryInput" value="<?php echo htmlspecialchars($currentCat); ?>">
+                        <input type="hidden" name="category" id="realCategoryInput"
+                            value="<?php echo htmlspecialchars($currentCat); ?>">
                     </div>
                 </form>
 
@@ -304,56 +305,50 @@ $result = mysqli_query($conn, $sql);
                     <tbody>
                         <?php
 
-                        /* keep existing connection if already connected */
-                        $conn = new mysqli("localhost", "root", "", "rodal", "3306");
 
-                        if ($conn->connect_error) {
-                            echo "<tr><td colspan='6' style='text-align:center; color:red;'>Connection Error: " . $conn->connect_error . "</td></tr>";
-                        } else {
+                        /* SEARCH */
+                        $search = isset($_GET['search']) ? trim($_GET['search']) : '';
 
-                            /* SEARCH */
-                            $search = isset($_GET['search']) ? trim($_GET['search']) : '';
+                        /* CATEGORY */
+                        $selectedCat = $_GET['category'] ?? 'all';
 
-                            /* CATEGORY */
-                            $selectedCat = $_GET['category'] ?? 'all';
+                        /* PAGINATION */
+                        $limit = 10;
+                        $page = isset($_GET['page']) ? max(1, (int) $_GET['page']) : 1;
+                        $offset = ($page - 1) * $limit;
 
-                            /* PAGINATION */
-                            $limit = 10;
-                            $page = isset($_GET['page']) ? max(1, (int) $_GET['page']) : 1;
-                            $offset = ($page - 1) * $limit;
+                        /* WHERE CONDITIONS */
+                        $where = [];
 
-                            /* WHERE CONDITIONS */
-                            $where = [];
+                        if (!empty($search)) {
+                            $searchSafe = $conn->real_escape_string($search);
+                            $where[] = "p.product_name LIKE '%$searchSafe%'";
+                        }
 
-                            if (!empty($search)) {
-                                $searchSafe = $conn->real_escape_string($search);
-                                $where[] = "p.product_name LIKE '%$searchSafe%'";
-                            }
+                        if ($selectedCat !== 'all' && !empty($selectedCat)) {
+                            $catSafe = $conn->real_escape_string($selectedCat);
+                            $where[] = "c.category_name = '$catSafe'";
+                        }
 
-                            if ($selectedCat !== 'all' && !empty($selectedCat)) {
-                                $catSafe = $conn->real_escape_string($selectedCat);
-                                $where[] = "c.category_name = '$catSafe'";
-                            }
+                        $whereSQL = '';
+                        if (!empty($where)) {
+                            $whereSQL = "WHERE " . implode(" AND ", $where);
+                        }
 
-                            $whereSQL = '';
-                            if (!empty($where)) {
-                                $whereSQL = "WHERE " . implode(" AND ", $where);
-                            }
-
-                            /* COUNT FOR PAGINATION */
-                            $countSql = "SELECT COUNT(*) AS total
+                        /* COUNT FOR PAGINATION */
+                        $countSql = "SELECT COUNT(*) AS total
                  FROM stock_transaction st
                  JOIN product p ON st.product_id = p.product_id
                  JOIN category c ON p.category_id = c.category_id
                  $whereSQL";
 
-                            $countRes = $conn->query($countSql);
-                            $countRow = $countRes->fetch_assoc();
-                            $total_rows = $countRow['total'];
-                            $total_pages = ceil($total_rows / $limit);
+                        $countRes = $conn->query($countSql);
+                        $countRow = $countRes->fetch_assoc();
+                        $total_rows = $countRow['total'];
+                        $total_pages = ceil($total_rows / $limit);
 
-                            /* MAIN QUERY WITH LIMIT */
-                            $sql = "SELECT 
+                        /* MAIN QUERY WITH LIMIT */
+                        $sql = "SELECT 
                             c.category_name,
                             p.product_name,
                             p.price,
@@ -368,88 +363,88 @@ $result = mysqli_query($conn, $sql);
                             $whereSQL
                             ORDER BY st.transaction_id DESC
                             LIMIT $limit OFFSET $offset";
-                            $result = $conn->query($sql);
+                        $result = $conn->query($sql);
 
-                            if ($result && $result->num_rows > 0) {
+                        if ($result && $result->num_rows > 0) {
 
-                                while ($row = $result->fetch_assoc()) {
+                            while ($row = $result->fetch_assoc()) {
 
-                                    $transaction_id = $row['transaction_id'];
+                                $transaction_id = $row['transaction_id'];
 
-                                    $subtotal = $row['price'] * $row['quantity'];
-                        ?>
-                                    <?php
-                                    // 1. Logic for Type Badge (PLACE THIS RIGHT BEFORE YOUR <tr>)
-                                    $type = $row['transaction_type'];
+                                $subtotal = $row['price'] * $row['quantity'];
+                                ?>
+                                <?php
+                                // 1. Logic for Type Badge (PLACE THIS RIGHT BEFORE YOUR <tr>)
+                                $type = $row['transaction_type'];
 
-                                    if ($type === 'ADJUSTMENT') {
-                                        $typeLabel = 'Adjustment';
-                                        $typeColor = '#7f8c8d'; // Gray for corrections
-                                    } else {
-                                        $isRestock = ($type === 'IN');
-                                        $typeLabel = $isRestock ? 'Restock' : 'Sale';
-                                        $typeColor = $isRestock ? '#3498db' : '#2e7d32'; // Blue for IN, Green for OUT
-                                    }
-
-                                    $subtotal = $row['price'] * $row['quantity'];
-                                    ?>
-                                    <tr>
-                                        <!-- 1. Date & Time -->
-                                        <td style="color: #666; font-size: 0.9rem;">
-                                            <?php echo date('M d, Y h:i A', strtotime($row['transaction_date'])); ?>
-                                        </td>
-
-                                        <td style="color: #666; font-size: 0.9rem;">
-                                            <?php echo $transaction_id; ?>
-                                        </td>
-
-                                        <!-- 2. Transaction Type -->
-                                        <td>
-                                            <!-- The Main Badge -->
-                                            <span
-                                                style="background: <?php echo $typeColor; ?>; color: white; padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase;">
-                                                <?php echo $typeLabel; ?>
-                                            </span>
-
-                                            <!-- The "Paper Trail" (Only shows IF there is a link) -->
-                                            <?php if (!empty($row['related_tid'])): ?>
-                                                <div
-                                                    style="font-size: 0.65rem; color: #7f8c8d; margin-top: 4px; font-style: italic; line-height: 1;">
-                                                    <?php
-                                                    echo ($row['transaction_type'] === 'ADJUSTMENT')
-                                                        ? "Adjustment of Transaction #" . $row['related_tid']
-                                                        : "Fixed by Transaction #" . $row['related_tid'];
-                                                    ?>
-                                                </div>
-                                            <?php endif; ?>
-                                        </td>
-
-                                        <!-- 3. Category -->
-                                        <td><?php echo htmlspecialchars(str_replace('_', ' ', $row['category_name'])); ?></td>
-
-                                        <!-- 4. Products -->
-                                        <td><?php echo htmlspecialchars($row['product_name']); ?></td>
-
-                                        <!-- 5. Price -->
-                                        <td style="font-weight:bold; color:#2e7d32;">
-                                            ₱<?php echo number_format($row['price'], 2); ?>
-                                        </td>
-
-                                        <!-- 6. Quantity -->
-                                        <td><?php echo $row['quantity']; ?></td>
-
-                                        <!-- 7. Subtotal -->
-                                        <td style="font-weight:bold; color:#333;">
-                                            ₱<?php echo number_format($subtotal, 2); ?>
-                                        </td>
-                                    </tr>
-
-                        <?php
+                                if ($type === 'ADJUSTMENT') {
+                                    $typeLabel = 'Adjustment';
+                                    $typeColor = '#7f8c8d'; // Gray for corrections
+                                } else {
+                                    $isRestock = ($type === 'IN');
+                                    $typeLabel = $isRestock ? 'Restock' : 'Sale';
+                                    $typeColor = $isRestock ? '#3498db' : '#2e7d32'; // Blue for IN, Green for OUT
                                 }
-                            } else {
-                                echo "<tr><td colspan='8' style='text-align:center;'>No transactions found.</td></tr>";
+
+                                $subtotal = $row['price'] * $row['quantity'];
+                                ?>
+                                <tr>
+                                    <!-- 1. Date & Time -->
+                                    <td style="color: #666; font-size: 0.9rem;">
+                                        <?php echo date('M d, Y h:i A', strtotime($row['transaction_date'])); ?>
+                                    </td>
+
+                                    <td style="color: #666; font-size: 0.9rem;">
+                                        <?php echo $transaction_id; ?>
+                                    </td>
+
+                                    <!-- 2. Transaction Type -->
+                                    <td>
+                                        <!-- The Main Badge -->
+                                        <span
+                                            style="background: <?php echo $typeColor; ?>; color: white; padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase;">
+                                            <?php echo $typeLabel; ?>
+                                        </span>
+
+                                        <!-- The "Paper Trail" (Only shows IF there is a link) -->
+                                        <?php if (!empty($row['related_tid'])): ?>
+                                            <div
+                                                style="font-size: 0.65rem; color: #7f8c8d; margin-top: 4px; font-style: italic; line-height: 1;">
+                                                <?php
+                                                echo ($row['transaction_type'] === 'ADJUSTMENT')
+                                                    ? "Adjustment of Transaction #" . $row['related_tid']
+                                                    : "Fixed by Transaction #" . $row['related_tid'];
+                                                ?>
+                                            </div>
+                                        <?php endif; ?>
+                                    </td>
+
+                                    <!-- 3. Category -->
+                                    <td><?php echo htmlspecialchars(str_replace('_', ' ', $row['category_name'])); ?></td>
+
+                                    <!-- 4. Products -->
+                                    <td><?php echo htmlspecialchars($row['product_name']); ?></td>
+
+                                    <!-- 5. Price -->
+                                    <td style="font-weight:bold; color:#2e7d32;">
+                                        ₱<?php echo number_format($row['price'], 2); ?>
+                                    </td>
+
+                                    <!-- 6. Quantity -->
+                                    <td><?php echo $row['quantity']; ?></td>
+
+                                    <!-- 7. Subtotal -->
+                                    <td style="font-weight:bold; color:#333;">
+                                        ₱<?php echo number_format($subtotal, 2); ?>
+                                    </td>
+                                </tr>
+
+                                <?php
                             }
+                        } else {
+                            echo "<tr><td colspan='8' style='text-align:center;'>No transactions found.</td></tr>";
                         }
+
                         ?>
                     </tbody>
                 </table>
@@ -461,7 +456,7 @@ $result = mysqli_query($conn, $sql);
 
             <script>
                 document.querySelectorAll(".delete-btn").forEach(button => {
-                    button.addEventListener("click", function() {
+                    button.addEventListener("click", function () {
                         const transactionId = this.getAttribute('data-id'); // Kunin ang ID mula sa button
                         const row = this.closest("tr"); // Kunin ang table row para matanggal mamaya
 

@@ -10,7 +10,38 @@ require 'db_connect.php';
 
 // 1. Capture All Filters
 $search = isset($_GET['search']) ? mysqli_real_escape_string($conn, $_GET['search']) : '';
-$category = (isset($_GET['category']) && $_GET['category'] !== 'all') ? mysqli_real_escape_string($conn, $_GET['category']) : '';
+$currentCat = (isset($_GET['category']) && $_GET['category'] !== 'all') ? mysqli_real_escape_string($conn, $_GET['category']) : 'all';
+$sort = $_GET['sort'] ?? 'default'; // Capture Sort
+
+// --- Define Dynamic ORDER BY ---
+switch ($sort) {
+    case 'most_sold':
+        $orderBy = "total_out DESC";
+        break;
+    case 'least_sold':
+        $orderBy = "total_out ASC";
+        break;
+    case 'alpha_asc':
+        $orderBy = "p.product_name ASC";
+        break;
+    case 'alpha_desc':
+        $orderBy = "p.product_name DESC";
+        break;
+    case 'price_asc':
+        $orderBy = "p.price ASC";
+        break;
+    case 'price_desc':
+        $orderBy = "p.price DESC";
+        break;
+    case 'stock_low':
+        $orderBy = "(SUM(CASE WHEN t.transaction_type = 'IN' THEN t.quantity ELSE 0 END) - SUM(CASE WHEN t.transaction_type = 'OUT' THEN t.quantity ELSE 0 END)) ASC";
+        break;
+    case 'stock_high':
+        $orderBy = "(SUM(CASE WHEN t.transaction_type = 'IN' THEN t.quantity ELSE 0 END) - SUM(CASE WHEN t.transaction_type = 'OUT' THEN t.quantity ELSE 0 END)) DESC";
+        break;
+    default:
+        $orderBy = "p.product_id ASC";
+}
 
 // 2. Setup Pagination Variables
 $limit = 10;
@@ -46,7 +77,7 @@ $sql = "SELECT p.product_id, p.product_name, p.product_sku, p.cost, p.category_i
         LEFT JOIN stock_transaction t ON p.product_id = t.product_id
         $whereClause
         GROUP BY p.product_id
-        ORDER BY p.product_id ASC
+        ORDER BY $orderBy 
         LIMIT $limit OFFSET $offset";
 
 $result = mysqli_query($conn, $sql);
@@ -92,8 +123,10 @@ while ($cat = mysqli_fetch_assoc($cat_result_modal)) {
                 <li><a href="dashboard.php"><i class="fas fa-th-large"></i> <span>Dashboard</span></a></li>
                 <li class="active"><a href="stocks.php"><i class="fas fa-boxes"></i> <span>Products</span></a></li>
                 <li><a href="profit_status.php"><i class="fas fa-coins"></i> <span>Profit Status</span></a></li>
-                <li><a href="purchase-history.php"><i class="fas fa-history"></i><span>Transactions History</span></a></li>
-                <li><a href="archived_products.php"><i class="fas fa-archive"></i> <span>Archived Products</span></a></li>
+                <li><a href="purchase-history.php"><i class="fas fa-history"></i><span>Transactions History</span></a>
+                </li>
+                <li><a href="archived_products.php"><i class="fas fa-archive"></i> <span>Archived Products</span></a>
+                </li>
             </ul>
         </aside>
 
@@ -137,22 +170,20 @@ while ($cat = mysqli_fetch_assoc($cat_result_modal)) {
                         </div>
 
                         <!-- DROPDOWN WRAPPER -->
-                        <div class="user-profile-wrapper" style="position: relative !important; display: inline-block !important; vertical-align: middle;">
+                        <div class="user-profile-wrapper"
+                            style="position: relative !important; display: inline-block !important; vertical-align: middle;">
 
-                            <div id="profileBtn" onclick="toggleProfileMenu(event)"
-                                style="cursor: pointer; 
+                            <div id="profileBtn" onclick="toggleProfileMenu(event)" style="cursor: pointer; 
                 padding: 2px; 
                 display: flex; 
                 align-items: center; 
                 justify-content: center; 
-                transition: opacity 0.2s;"
-                                onmouseover="this.style.opacity='0.8'"
-                                onmouseout="this.style.opacity='1'">
-                                <i class="fas fa-user-circle" style="font-size: 24px !important; color: #333 !important;"></i>
+                transition: opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+                                <i class="fas fa-user-circle"
+                                    style="font-size: 24px !important; color: #333 !important;"></i>
                             </div>
 
-                            <div id="profileDropdown"
-                                style="display: none; 
+                            <div id="profileDropdown" style="display: none; 
                 position: absolute !important; 
                 top: 40px !important; 
                 right: 0 !important; 
@@ -166,18 +197,19 @@ while ($cat = mysqli_fetch_assoc($cat_result_modal)) {
                 z-index: 99999 !important;
                 overflow: hidden !important;">
 
-                                <div style="padding: 12px 18px; border-bottom: 1px solid #f0f0f0; background: #fff; text-align: left !important;">
-                                    <strong style="display: block !important; color: #333 !important; font-size: 14px !important; line-height: 1.2 !important; margin: 0 !important;">
+                                <div
+                                    style="padding: 12px 18px; border-bottom: 1px solid #f0f0f0; background: #fff; text-align: left !important;">
+                                    <strong
+                                        style="display: block !important; color: #333 !important; font-size: 14px !important; line-height: 1.2 !important; margin: 0 !important;">
                                         <?php echo htmlspecialchars($_SESSION['username']); ?>
                                     </strong>
-                                    <span style="color: #888 !important; font-size: 12px !important; font-weight: normal !important;">
+                                    <span
+                                        style="color: #888 !important; font-size: 12px !important; font-weight: normal !important;">
                                         <?php echo htmlspecialchars(ucfirst($_SESSION['role'])); ?>
                                     </span>
                                 </div>
 
-                                <a href="logout.php"
-                                    onclick="confirmLogout(event)"
-                                    style="display: flex !important; 
+                                <a href="logout.php" onclick="confirmLogout(event)" style="display: flex !important; 
                   align-items: center !important; 
                   gap: 10px !important; 
                   padding: 12px 18px !important; 
@@ -188,8 +220,7 @@ while ($cat = mysqli_fetch_assoc($cat_result_modal)) {
                   justify-content: flex-start !important;
                   width: 100% !important;
                   white-space: nowrap !important;
-                  transition: background 0.2s;"
-                                    onmouseover="this.style.backgroundColor='#fff5f5'"
+                  transition: background 0.2s;" onmouseover="this.style.backgroundColor='#fff5f5'"
                                     onmouseout="this.style.backgroundColor='#ffffff'">
                                     <i class="fas fa-sign-out-alt"></i> Log Out
                                 </a>
@@ -203,7 +234,7 @@ while ($cat = mysqli_fetch_assoc($cat_result_modal)) {
                                 menu.style.display = (menu.style.display === "none" || menu.style.display === "") ? "block" : "none";
                             }
 
-                            window.addEventListener('click', function(e) {
+                            window.addEventListener('click', function (e) {
                                 var menu = document.getElementById("profileDropdown");
                                 var btn = document.getElementById("profileBtn");
                                 if (menu && menu.style.display === "block") {
@@ -213,7 +244,7 @@ while ($cat = mysqli_fetch_assoc($cat_result_modal)) {
                                 }
                             });
 
-                            window.addEventListener('keydown', function(e) {
+                            window.addEventListener('keydown', function (e) {
                                 if (e.key === "Escape") {
                                     document.getElementById("profileDropdown").style.display = "none";
                                 }
@@ -234,8 +265,13 @@ while ($cat = mysqli_fetch_assoc($cat_result_modal)) {
                     <div class="pagination-container">
                         <?php
                         $url_params = '';
-                        if (!empty($search)) $url_params .= '&search=' . urlencode($search);
-                        if (!empty($category)) $url_params .= '&category=' . urlencode($category);
+                        if (!empty($search))
+                            $url_params .= '&search=' . urlencode($search);
+                        if (!empty($category))
+                            $url_params .= '&category=' . urlencode($category);
+                        if ($sort !== 'default')
+                            $url_params .= '&sort=' . urlencode($sort); // <--- ADD THIS
+                        
                         ?>
                         <div class="pagination">
                             <?php if ($page > 1): ?>
@@ -261,34 +297,86 @@ while ($cat = mysqli_fetch_assoc($cat_result_modal)) {
                     $currentCat = $_GET['category'] ?? 'all';
                     ?>
 
-                    <form method="GET" id="filterForm" action="stocks.php">
+                    <form method="GET" id="filterForm" action="stocks.php" style="display: flex; gap: 15px;">
+                        <!-- Keep the search value -->
                         <input type="hidden" name="search" value="<?php echo htmlspecialchars($search); ?>">
 
+                        <!-- 2. SORT DROPDOWN (New) -->
+                        <div class="modern-dropdown" id="sortDropdown">
+                            <div class="dropdown-trigger">
+                                <span>
+                                    <?php
+                                    $labels = [
+                                        'default' => 'Default Sort',
+                                        'most_sold' => 'Sales: Most Sold',
+                                        'least_sold' => 'Sales: Least Sold',
+                                        'alpha_asc' => 'Name: A to Z',
+                                        'alpha_desc' => 'Name: Z to A',
+                                        'price_asc' => 'Price: Low-High',
+                                        'price_desc' => 'Price: High-Low',
+                                        'stock_low' => 'Stock: Low-High',
+                                        'stock_high' => 'Stock: High-Low'
+                                    ];
+                                    echo $labels[$sort] ?? 'Default Sort';
+                                    ?>
+                                </span>
+                                <i class="fas fa-sort-amount-down"></i>
+                            </div>
+                            <ul class="dropdown-menu">
+                                <li data-value="default" class="<?php echo ($sort == 'default') ? 'active' : ''; ?>">
+                                    Default Sort</li>
+                                <li data-value="most_sold"
+                                    class="<?php echo ($sort == 'most_sold') ? 'active' : ''; ?>">Sales: Most Sold</li>
+                                <li data-value="least_sold"
+                                    class="<?php echo ($sort == 'least_sold') ? 'active' : ''; ?>">Sales: Least Sold
+                                </li>
+                                <li data-value="alpha_asc"
+                                    class="<?php echo ($sort == 'alpha_asc') ? 'active' : ''; ?>">Name: A to Z</li>
+                                <li data-value="alpha_desc"
+                                    class="<?php echo ($sort == 'alpha_desc') ? 'active' : ''; ?>">Name: Z to A</li>
+                                <li data-value="price_asc"
+                                    class="<?php echo ($sort == 'price_asc') ? 'active' : ''; ?>">Price: Low to High
+                                </li>
+                                <li data-value="price_desc"
+                                    class="<?php echo ($sort == 'price_desc') ? 'active' : ''; ?>">Price: High to Low
+                                </li>
+                                <li data-value="stock_low"
+                                    class="<?php echo ($sort == 'stock_low') ? 'active' : ''; ?>">Stock: Low to High
+                                </li>
+                                <li data-value="stock_high"
+                                    class="<?php echo ($sort == 'stock_high') ? 'active' : ''; ?>">Stock: High to Low
+                                </li>
+                            </ul>
+                            <input type="hidden" name="sort" id="realSortInput"
+                                value="<?php echo htmlspecialchars($sort); ?>">
+                        </div>
+
+                        <!-- 1. CATEGORY DROPDOWN (Existing) -->
                         <div class="modern-dropdown" id="categoryDropdown">
                             <div class="dropdown-trigger">
                                 <span id="selectedDisplay">
-                                    <?php
-                                    echo ($currentCat === 'all') ? 'All Categories' : str_replace('_', ' ', $currentCat);
-                                    ?>
+                                    <?php echo ($currentCat === 'all') ? 'All Categories' : str_replace('_', ' ', $currentCat); ?>
                                 </span>
                                 <i class="fas fa-chevron-down"></i>
                             </div>
-
                             <ul class="dropdown-menu">
-                                <li data-value="all" class="<?php echo ($currentCat == 'all') ? 'active' : ''; ?>">All Categories</li>
+                                <li data-value="all" class="<?php echo ($currentCat == 'all') ? 'active' : ''; ?>">All
+                                    Categories</li>
                                 <?php
                                 $cats = ["TOILETRIES", "BEVERAGE", "DRINK_POWDERED", "FOOD_CANNED", "FOOD_INSTANT", "FOOD_SNACK", "FOOD_INGREDIENT", "FOOD_RICE", "CLEANING_AGENTS"];
                                 foreach ($cats as $cat) {
                                     $isActive = ($currentCat == $cat) ? 'active' : '';
-                                    $readableName = str_replace('_', ' ', $cat);
-                                    echo "<li data-value='$cat' class='$isActive'>$readableName</li>";
+                                    echo "<li data-value='$cat' class='$isActive'>" . str_replace('_', ' ', $cat) . "</li>";
                                 }
                                 ?>
                             </ul>
-
-                            <input type="hidden" name="category" id="realCategoryInput" value="<?php echo htmlspecialchars($currentCat); ?>">
+                            <input type="hidden" name="category" id="realCategoryInput"
+                                value="<?php echo htmlspecialchars($currentCat); ?>">
                         </div>
+
+
                     </form>
+
 
                 </div>
 
@@ -311,7 +399,7 @@ while ($cat = mysqli_fetch_assoc($cat_result_modal)) {
                             $stock = $row['total_in'] - $row['total_out'];
                             $sold = $row['total_out'];
                             $catAttr = strtoupper(str_replace(' ', '_', $row['category_name']));
-                        ?>
+                            ?>
                             <tr data-category="<?php echo $catAttr; ?>">
                                 <td><?php echo htmlspecialchars($row['product_name']); ?></td>
                                 <td><?php echo ucwords(strtolower(str_replace('_', ' ', $row['category_name']))); ?></td>
@@ -332,12 +420,15 @@ while ($cat = mysqli_fetch_assoc($cat_result_modal)) {
                                 </td>
                                 <td>
                                     <div class="action-group" style="display: flex; align-items: center; gap: 8px;">
-                                        <button class="add-btn" onclick="updateStock(<?php echo $row['product_id']; ?>, 'IN')">Add</button>
+                                        <button class="add-btn"
+                                            onclick="updateStock(<?php echo $row['product_id']; ?>, 'IN')">Add</button>
 
-                                        <button class="sell-btn" onclick="updateStock(<?php echo $row['product_id']; ?>, 'OUT', <?php echo $stock; ?>)">Sell</button>
+                                        <button class="sell-btn"
+                                            onclick="updateStock(<?php echo $row['product_id']; ?>, 'OUT', <?php echo $stock; ?>)">Sell</button>
 
                                         <div class="action-menu-container">
-                                            <button class="action-trigger-btn" onclick="toggleMenu(event, <?php echo $row['product_id']; ?>)">
+                                            <button class="action-trigger-btn"
+                                                onclick="toggleMenu(event, <?php echo $row['product_id']; ?>)">
                                                 <i class="fas fa-ellipsis-v"></i>
                                             </button>
 
@@ -387,7 +478,8 @@ while ($cat = mysqli_fetch_assoc($cat_result_modal)) {
                 <div class="modal-body">
                     <div class="form-group">
                         <label for="new_product_name">Product Name <span class="required">*</span></label>
-                        <input type="text" id="new_product_name" name="product_name" placeholder="e.g. Lucky Me Pancit Canton" required>
+                        <input type="text" id="new_product_name" name="product_name"
+                            placeholder="e.g. Lucky Me Pancit Canton" required>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
@@ -410,11 +502,13 @@ while ($cat = mysqli_fetch_assoc($cat_result_modal)) {
                     <div class="form-row">
                         <div class="form-group">
                             <label for="new_cost">Cost Price (₱) <span class="required">*</span></label>
-                            <input type="number" id="new_cost" name="cost" placeholder="0.00" step="0.01" min="0" required>
+                            <input type="number" id="new_cost" name="cost" placeholder="0.00" step="0.01" min="0"
+                                required>
                         </div>
                         <div class="form-group">
                             <label for="new_price">Selling Price (₱) <span class="required">*</span></label>
-                            <input type="number" id="new_price" name="price" placeholder="0.00" step="0.01" min="0" required>
+                            <input type="number" id="new_price" name="price" placeholder="0.00" step="0.01" min="0"
+                                required>
                         </div>
                     </div>
                 </div>
@@ -500,7 +594,7 @@ while ($cat = mysqli_fetch_assoc($cat_result_modal)) {
         }
 
         // Close the menu if you click anywhere else on the screen
-        window.onclick = function() {
+        window.onclick = function () {
             document.querySelectorAll('.dropdown-menu').forEach(menu => {
                 menu.classList.remove('show');
             });
