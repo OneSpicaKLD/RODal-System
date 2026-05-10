@@ -11,7 +11,8 @@ This system was developed as a collaboration for the partial completion of the f
 * **CCIS2205/L** 
 
 **Client:** Rodal Store  
-**Institution:** BSIS-206 Students
+**Institution:** Kolehiyo ng Lungsod ng Dasmariñas - Institute of Computing and Digital Innovation
+**Developed by:** BSIS-206 Students
 
 ---
 
