@@ -321,9 +321,6 @@ $result = mysqli_query($conn, $sql);
                     <tbody>
                         <?php
 
-                        /* keep existing connection if already connected */
-                        $conn = new mysqli("localhost", "root", "", "rodal", "3306  ");
-
                         if ($conn->connect_error) {
                             echo "<tr><td colspan='6' style='text-align:center; color:red;'>Connection Error: " . $conn->connect_error . "</td></tr>";
                         } else {
