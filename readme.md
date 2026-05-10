@@ -1,30 +1,37 @@
-# README
+# Inventory and Stock Monitoring System
+### For Rodal Sari-Sari Store
 
-# DEVELOPMENT OF INVENTORY AND STOCK MONITORING SYSTEM FOR RODAL SARI-SARI STORE
+---
 
-# DEVELOPED BY BSIS-206 STUDENTS FOR RODAL STORE
+## 📌 Project Overview
+This system was developed as a collaboration for the partial completion of the following courses:
+* **PCIS2205** 
+* **PCIS2206** 
+* **PCIS2209** 
+* **CCIS2205/L** 
 
-# PROJECT COLLABORATION FOR PARTIAL COMPLETION OF PCIS2205, PCIS2206, PCIS 2209 AND CCIS2205/L 
+**Client:** Rodal Store  
+**Institution:** BSIS-206 Students
 
+---
 
+## 👥 The Development Team
+* **Jheron O. Bangcale**
+* **Joneah M. Barte**
+* **Princes Nicole V. Canaria**
+* **Jean Matthew B. Cruz**
+* **Melen B. Locre**
+* **Harold A. Silguera**
+* **Nathaniel C. Timan**
 
+---
 
-# DEVELPOERS OF INVENTORY AND STOCK MONITORING SYSTEM FOR RODAL SARI-SARI STORE
+## 🛠 Developer Guidelines
+To maintain code integrity and system stability, all developers must adhere to the following:
 
-# JHERON O. BANGCALE
-# JONEAH M. BARTE
-# PRINCES NICOLE V. CANARIA
-# JEAN MATTHEW B. CRUZ
-# MELEN B. LOCRE
-# HAROLD A. SILGUERA
-# NATHANIEL C. TIMAN
+1. **Code Integrity**: Do not alter irrelevant PHP code or core database logic without prior discussion.
+2. **Database Configuration**: Do **NOT** add unnecessary ports or hardcode personal credentials. Edit the port only in `db_connect.php` to match your local XAMPP environment.
+3. **Commit Cleanly**: Always provide a clear description when pushing updates to the repository.
 
-
-
-
-
-
-# NOTES FOR DEVS
-# 1. DO NOT ALTER IRRELEVANT PHP CODE/LOGIC
-# 2. DO NOT ADD UNNECESSARY PORTS, EDIT the port at db_connect.php for your local machine
-
+---
+*Developed with ❤️ for the Rodal Store Community.*
