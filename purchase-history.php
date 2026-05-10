@@ -304,8 +304,6 @@ $result = mysqli_query($conn, $sql);
 
                     <tbody>
                         <?php
-
-
                         /* SEARCH */
                         $search = isset($_GET['search']) ? trim($_GET['search']) : '';
 
