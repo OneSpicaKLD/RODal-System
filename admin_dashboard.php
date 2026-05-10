@@ -9,54 +9,68 @@ if (!isset($_SESSION['isLoggedIn']) || $_SESSION['role'] !== 'admin') {
 
 require 'db_connect.php';
 
-// 2. Capture Filters
+// 2. Capture Filters (Restored to your original names)
 $search = isset($_GET['search']) ? mysqli_real_escape_string($conn, trim($_GET['search'])) : '';
-$category = (isset($_GET['category']) && $_GET['category'] !== 'all') ? mysqli_real_escape_string($conn, $_GET['category']) : '';
+$category = (isset($_GET['category']) && $_GET['category'] !== 'all') ? mysqli_real_escape_string($conn, $_GET['category']) : 'all';
+$sort = $_GET['sort'] ?? 'newest';
 
-// 3. Setup Pagination
+// 3. Define Sorting logic
+switch ($sort) {
+    case 'oldest':
+        $orderBy = "st.transaction_id ASC";
+        break;
+    case 'highest_val':
+        $orderBy = "(st.quantity * p.price) DESC";
+        break;
+    case 'lowest_val':
+        $orderBy = "(st.quantity * p.price) ASC";
+        break;
+    case 'type':
+        $orderBy = "st.transaction_type ASC, st.transaction_date DESC";
+        break;
+    default:
+        $orderBy = "st.transaction_id DESC";
+}
+
+// 4. Setup Pagination
 $limit = 10;
 $page = isset($_GET['page']) ? max(1, (int) $_GET['page']) : 1;
 $offset = ($page - 1) * $limit;
 
-// 4. Build WHERE Clause for TRANSACTIONS
+// 5. Build WHERE Clause (Fixed the category logic)
 $conditions = [];
 if (!empty($search)) {
     $conditions[] = "(p.product_name LIKE '%$search%' OR c.category_name LIKE '%$search%')";
 }
-if (!empty($category)) {
+if ($category !== 'all' && !empty($category)) {
     $conditions[] = "c.category_name = '$category'";
 }
-
 $whereClause = !empty($conditions) ? "WHERE " . implode(" AND ", $conditions) : "";
 
-// 5. Get Total Count for Transactions (for Pagination)
+// 6. Get Total Count (Restored $total_pages for your pagination)
 $count_query = "SELECT COUNT(*) as total 
                 FROM stock_transaction st
                 JOIN product p ON st.product_id = p.product_id
                 JOIN category c ON p.category_id = c.category_id 
                 $whereClause";
 $count_res = mysqli_query($conn, $count_query);
-$total_rows = mysqli_fetch_assoc($count_res)['total'];
-$total_pages = ceil($total_rows / $limit);
+$total_row_data = mysqli_fetch_assoc($count_res);
+$total_rows = $total_row_data['total'];
+$total_pages = ceil($total_rows / $limit); // <--- Fixed the Undefined Variable error
 
-// 6. Main Transaction Query (This is what the Admin needs to see)
-$sql = "SELECT 
-            st.transaction_id, 
-            st.transaction_date, 
-            st.transaction_type, 
-            st.quantity, 
-            p.product_name, 
-            p.price, 
-            c.category_name
+// 7. Main Transaction Query
+$sql = "SELECT st.transaction_id, st.transaction_date, st.transaction_type, st.quantity, st.related_tid,
+               p.product_name, p.price, c.category_name
         FROM stock_transaction st
         JOIN product p ON st.product_id = p.product_id
         JOIN category c ON p.category_id = c.category_id
         $whereClause
-        ORDER BY st.transaction_id DESC
+        ORDER BY $orderBy
         LIMIT $limit OFFSET $offset";
 
 $result = mysqli_query($conn, $sql);
 ?>
+
 
 
 <!DOCTYPE html>
@@ -140,22 +154,20 @@ $result = mysqli_query($conn, $sql);
                             <div class="user-actions">
 
                                 <!-- DROPDOWN WRAPPER -->
-                                <div class="user-profile-wrapper" style="position: relative !important; display: inline-block !important; vertical-align: middle;">
+                                <div class="user-profile-wrapper"
+                                    style="position: relative !important; display: inline-block !important; vertical-align: middle;">
 
-                                    <div id="profileBtn" onclick="toggleProfileMenu(event)"
-                                        style="cursor: pointer; 
+                                    <div id="profileBtn" onclick="toggleProfileMenu(event)" style="cursor: pointer; 
                 padding: 2px; 
                 display: flex; 
                 align-items: center; 
                 justify-content: center; 
-                transition: opacity 0.2s;"
-                                        onmouseover="this.style.opacity='0.8'"
-                                        onmouseout="this.style.opacity='1'">
-                                        <i class="fas fa-user-circle" style="font-size: 24px !important; color: #333 !important;"></i>
+                transition: opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+                                        <i class="fas fa-user-circle"
+                                            style="font-size: 24px !important; color: #333 !important;"></i>
                                     </div>
 
-                                    <div id="profileDropdown"
-                                        style="display: none; 
+                                    <div id="profileDropdown" style="display: none; 
                 position: absolute !important; 
                 top: 40px !important; 
                 right: 0 !important; 
@@ -169,18 +181,19 @@ $result = mysqli_query($conn, $sql);
                 z-index: 99999 !important;
                 overflow: hidden !important;">
 
-                                        <div style="padding: 12px 18px; border-bottom: 1px solid #f0f0f0; background: #fff; text-align: left !important;">
-                                            <strong style="display: block !important; color: #333 !important; font-size: 14px !important; line-height: 1.2 !important; margin: 0 !important;">
+                                        <div
+                                            style="padding: 12px 18px; border-bottom: 1px solid #f0f0f0; background: #fff; text-align: left !important;">
+                                            <strong
+                                                style="display: block !important; color: #333 !important; font-size: 14px !important; line-height: 1.2 !important; margin: 0 !important;">
                                                 <?php echo htmlspecialchars($_SESSION['username']); ?>
                                             </strong>
-                                            <span style="color: #888 !important; font-size: 12px !important; font-weight: normal !important;">
+                                            <span
+                                                style="color: #888 !important; font-size: 12px !important; font-weight: normal !important;">
                                                 <?php echo htmlspecialchars(ucfirst($_SESSION['role'])); ?>
                                             </span>
                                         </div>
 
-                                        <a href="logout.php"
-                                            onclick="confirmLogout(event)"
-                                            style="display: flex !important; 
+                                        <a href="logout.php" onclick="confirmLogout(event)" style="display: flex !important; 
                   align-items: center !important; 
                   gap: 10px !important; 
                   padding: 12px 18px !important; 
@@ -191,8 +204,7 @@ $result = mysqli_query($conn, $sql);
                   justify-content: flex-start !important;
                   width: 100% !important;
                   white-space: nowrap !important;
-                  transition: background 0.2s;"
-                                            onmouseover="this.style.backgroundColor='#fff5f5'"
+                  transition: background 0.2s;" onmouseover="this.style.backgroundColor='#fff5f5'"
                                             onmouseout="this.style.backgroundColor='#ffffff'">
                                             <i class="fas fa-sign-out-alt"></i> Log Out
                                         </a>
@@ -206,7 +218,7 @@ $result = mysqli_query($conn, $sql);
                                         menu.style.display = (menu.style.display === "none" || menu.style.display === "") ? "block" : "none";
                                     }
 
-                                    window.addEventListener('click', function(e) {
+                                    window.addEventListener('click', function (e) {
                                         var menu = document.getElementById("profileDropdown");
                                         var btn = document.getElementById("profileBtn");
                                         if (menu && menu.style.display === "block") {
@@ -216,7 +228,7 @@ $result = mysqli_query($conn, $sql);
                                         }
                                     });
 
-                                    window.addEventListener('keydown', function(e) {
+                                    window.addEventListener('keydown', function (e) {
                                         if (e.key === "Escape") {
                                             document.getElementById("profileDropdown").style.display = "none";
                                         }
@@ -268,34 +280,56 @@ $result = mysqli_query($conn, $sql);
                 $currentCat = $_GET['category'] ?? 'all';
                 ?>
 
-                <form method="GET" id="filterForm" action="admin_dashboard.php">
+                <form method="GET" id="filterForm" action="admin_dashboard.php" style="display: flex; gap: 15px;">
                     <input type="hidden" name="search" value="<?php echo htmlspecialchars($search); ?>">
 
-                    <div class="modern-dropdown" id="categoryDropdown">
+                    <!-- 1. Sort Dropdown -->
+                    <div class="modern-dropdown" id="sortDropdown">
                         <div class="dropdown-trigger">
-                            <span id="selectedDisplay">
+                            <span>
                                 <?php
-                                echo ($currentCat === 'all') ? 'All Categories' : str_replace('_', ' ', $currentCat);
+                                $labels = ['newest' => 'Newest First', 'oldest' => 'Oldest First', 'highest_val' => 'Value: High-Low', 'lowest_val' => 'Value: Low-High', 'type' => 'Group by Type'];
+                                echo $labels[$sort] ?? 'Newest First';
                                 ?>
                             </span>
+                            <i class="fas fa-sort-amount-down"></i>
+                        </div>
+                        <ul class="dropdown-menu">
+                            <li data-value="newest" class="<?php echo ($sort == 'newest') ? 'active' : ''; ?>">Newest
+                                First</li>
+                            <li data-value="oldest" class="<?php echo ($sort == 'oldest') ? 'active' : ''; ?>">Oldest
+                                First</li>
+                            <li data-value="highest_val"
+                                class="<?php echo ($sort == 'highest_val') ? 'active' : ''; ?>">Value: High to Low</li>
+                            <li data-value="lowest_val" class="<?php echo ($sort == 'lowest_val') ? 'active' : ''; ?>">
+                                Value: Low to High</li>
+                            <li data-value="type" class="<?php echo ($sort == 'type') ? 'active' : ''; ?>">Group by Type
+                            </li>
+                        </ul>
+                        <input type="hidden" name="sort" value="<?php echo htmlspecialchars($sort); ?>">
+                    </div>
+
+                    <!-- 2. Category Dropdown -->
+                    <div class="modern-dropdown" id="categoryDropdown">
+                        <div class="dropdown-trigger">
+                            <span><?php echo ($category === 'all') ? 'All Categories' : str_replace('_', ' ', $category); ?></span>
                             <i class="fas fa-chevron-down"></i>
                         </div>
-
                         <ul class="dropdown-menu">
-                            <li data-value="all" class="<?php echo ($currentCat == 'all') ? 'active' : ''; ?>">All Categories</li>
+                            <li data-value="all" class="<?php echo ($category == 'all') ? 'active' : ''; ?>">All
+                                Categories</li>
                             <?php
                             $cats = ["TOILETRIES", "BEVERAGE", "DRINK_POWDERED", "FOOD_CANNED", "FOOD_INSTANT", "FOOD_SNACK", "FOOD_INGREDIENT", "FOOD_RICE", "CLEANING_AGENTS"];
                             foreach ($cats as $cat) {
-                                $isActive = ($currentCat == $cat) ? 'active' : '';
-                                $readableName = str_replace('_', ' ', $cat);
-                                echo "<li data-value='$cat' class='$isActive'>$readableName</li>";
+                                $isActive = ($category == $cat) ? 'active' : '';
+                                echo "<li data-value='$cat' class='$isActive'>" . str_replace('_', ' ', $cat) . "</li>";
                             }
                             ?>
                         </ul>
-
-                        <input type="hidden" name="category" id="realCategoryInput" value="<?php echo htmlspecialchars($currentCat); ?>">
+                        <input type="hidden" name="category" value="<?php echo htmlspecialchars($category); ?>">
                     </div>
                 </form>
+
 
 
 
@@ -367,23 +401,23 @@ $result = mysqli_query($conn, $sql);
                             $total_pages = ceil($total_rows / $limit);
 
                             /* MAIN QUERY WITH LIMIT */
-                            $sql = "SELECT 
-                                    st.transaction_id, 
-                                    st.transaction_date, 
-                                    st.transaction_type, 
-                                    st.quantity, 
-                                    st.related_tid, -- <--- ADD THIS COLUMN HERE
-                                    p.product_name, 
-                                    p.price, 
-                                    c.category_name
-                                    FROM stock_transaction st
-                                    JOIN product p ON st.product_id = p.product_id
-                                    JOIN category c ON p.category_id = c.category_id
-                                    $whereClause
-                                    ORDER BY st.transaction_id DESC
-                                    LIMIT $limit OFFSET $offset";
-                            $result = $conn->query($sql);
-
+                            // $sql = "SELECT 
+                            //         st.transaction_id, 
+                            //         st.transaction_date, 
+                            //         st.transaction_type, 
+                            //         st.quantity, 
+                            //         st.related_tid, 
+                            //         p.product_name, 
+                            //         p.price, 
+                            //         c.category_name
+                            //         FROM stock_transaction st
+                            //         JOIN product p ON st.product_id = p.product_id
+                            //         JOIN category c ON p.category_id = c.category_id
+                            //         $whereClause
+                            //         ORDER BY st.transaction_id DESC
+                            //         LIMIT $limit OFFSET $offset";
+                            // $result = $conn->query($sql);
+                        
                             if ($result && $result->num_rows > 0) {
 
                                 while ($row = $result->fetch_assoc()) {
@@ -391,7 +425,7 @@ $result = mysqli_query($conn, $sql);
                                     $transaction_id = $row['transaction_id'];
 
                                     $subtotal = $row['price'] * $row['quantity'];
-                        ?>
+                                    ?>
                                     <?php
                                     // 1. Logic for Type Badge (PLACE THIS RIGHT BEFORE YOUR <tr>)
                                     $type = $row['transaction_type'];
@@ -451,7 +485,7 @@ $result = mysqli_query($conn, $sql);
                                             // 1. It is NOT an adjustment entry itself
                                             // 2. AND it hasn't been fixed yet (related_tid is empty)
                                             if ($row['transaction_type'] !== 'ADJUSTMENT' && empty($row['related_tid'])):
-                                            ?>
+                                                ?>
                                                 <button class="sell-btn"
                                                     onclick="confirmReversal(<?php echo $row['transaction_id']; ?>, <?php echo $row['quantity']; ?>, '<?php echo htmlspecialchars($row['product_name']); ?>')">
                                                     <i class="fas fa-undo"></i> Reverse
@@ -472,7 +506,7 @@ $result = mysqli_query($conn, $sql);
 
                                     </tr>
 
-                        <?php
+                                    <?php
                                 }
                             } else {
                                 echo "<tr><td colspan='6' style='text-align:center;'>No transactions found.</td></tr>";
@@ -489,7 +523,7 @@ $result = mysqli_query($conn, $sql);
 
             <script>
                 document.querySelectorAll(".delete-btn").forEach(button => {
-                    button.addEventListener("click", function() {
+                    button.addEventListener("click", function () {
                         const transactionId = this.getAttribute('data-id'); // Kunin ang ID mula sa button
                         const row = this.closest("tr"); // Kunin ang table row para matanggal mamaya
 
