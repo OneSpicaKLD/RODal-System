@@ -48,16 +48,22 @@ $limit = 10;
 $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
 $offset = ($page - 1) * $limit;
 
-// 3. Build Dynamic WHERE Clause — only show active products
+// 3. Build Dynamic WHERE Clause
 $conditions = [];
 $conditions[] = "p.is_active = 1";
-$conditions[] = "p.product_name LIKE '%$search%'";
 
-if (!empty($category)) {
-    $conditions[] = "c.category_name = '$category'";
+// Handle Search
+if (!empty($search)) {
+    $conditions[] = "p.product_name LIKE '%$search%'";
+}
+
+// FIX: Use $currentCat (matching your Section 1)
+if ($currentCat !== 'all') {
+    $conditions[] = "c.category_name = '$currentCat'";
 }
 
 $whereClause = "WHERE " . implode(" AND ", $conditions);
+
 
 // 4. Get Total Count (For Pagination)
 $total_query = "SELECT COUNT(*) as total 
