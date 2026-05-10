@@ -1,0 +1,1977 @@
+    :root {
+        --bg-yellow: #fffdf0;
+        --card-yellow: #fdfbd4;
+        --text-dark: #333;
+        --sidebar-collapsed: 80px;
+        --sidebar-expanded: 250px;
+        --accent: #f1c40f;
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+
+    body {
+        background-color: #fff;
+        color: var(--text-dark);
+        overflow: hidden;
+    }
+
+    .container {
+        display: flex;
+        min-height: 100vh;
+        width: 100%;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+        width: var(--sidebar-collapsed);
+        height: 100vh;
+        background: #fff;
+        transition: width 0.3s ease;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        padding-top: 20px;
+        box-shadow: 2px 0px 10px rgba(0, 0, 0, 0.05);
+        flex-shrink: 0;
+        z-index: 100;
+    }
+
+    /* EXPAND ON HOVER */
+    .sidebar:hover {
+        width: var(--sidebar-expanded);
+    }
+
+    /* LOGO */
+    .logo {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 0 15px;
+        margin-bottom: 30px;
+        white-space: nowrap;
+    }
+
+    .logo-r {
+        min-width: 50px;
+        height: 50px;
+        font-size: 28px;
+        background-color: var(--accent);
+        color: #000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 12px;
+        font-weight: 900;
+    }
+
+    a.logo-r {
+        text-decoration: none;
+    }
+
+    /* HIDE LOGO TEXT BY DEFAULT */
+    .logo-text {
+        opacity: 0;
+        visibility: hidden;
+        transition: 0.2s;
+    }
+
+    /* SHOW WHEN HOVER */
+    .sidebar:hover .logo-text {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    /* NAVIGATION */
+    .nav-links {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .nav-links li {
+        padding: 0 10px;
+        margin: 8px 0;
+    }
+
+    .nav-links li a {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 12px;
+        color: var(--text-dark);
+        text-decoration: none;
+        border-radius: 8px;
+        transition: 0.3s;
+        white-space: nowrap;
+    }
+
+    /* ACTIVE */
+    .nav-links li.active a {
+        background: var(--accent);
+        font-weight: bold;
+    }
+
+    /* ICON */
+    .nav-links li a i {
+        min-width: 40px;
+        text-align: center;
+        font-size: 22px;
+    }
+
+    /* HIDE TEXT BY DEFAULT */
+    .nav-links li a span {
+        opacity: 0;
+        visibility: hidden;
+        transition: 0.2s;
+    }
+
+    /* SHOW TEXT ON HOVER */
+    .sidebar:hover .nav-links li a span {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    /* MAIN CONTENT */
+    .main-content {
+        flex: 1;
+        padding: 30px;
+        height: 100vh;
+        overflow-y: auto;
+        animation: fadeIn .5s ease;
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    header {
+        display: flex;
+        justify-content: space-between;
+        /* Keeps Title on left, Actions on right */
+        align-items: center;
+        margin-bottom: 40px;
+    }
+
+    .header-right-wide {
+        display: flex;
+        align-items: center;
+        /* Vertically centers search and buttons */
+        gap: 20px;
+        /* Adjusts spacing between search bar and buttons */
+    }
+
+    .large-search {
+        background: #E6B800;
+        border-radius: 10px;
+        padding: 5px 15px;
+        display: flex;
+        align-items: center;
+        width: 400px;
+        /* You can adjust this width as needed */
+    }
+
+    .user-actions {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        /* Spacing between the Bell and Profile icons */
+    }
+
+    .user-actions button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 26px;
+        /* Match your existing icon size */
+        color: var(--text-dark);
+        display: flex;
+        align-items: center;
+    }
+
+    .header-right {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+    /* --- SEARCH BAR CONTAINER --- */
+    .search-bar {
+        position: relative;
+        width: 250px;
+    }
+
+    .search-bar form {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    /* --- MAGNIFYING GLASS (The <i> tag) --- */
+    /* We target the <i> directly inside the form */
+    .search-bar form>i.fa-search {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #999;
+        font-size: 14px;
+        z-index: 5;
+        pointer-events: none;
+        /* User clicks "through" the icon to the input */
+    }
+
+    /* --- THE INPUT FIELD --- */
+    .search-bar input {
+        width: 100%;
+        /* Left padding (40px) makes room for magnifying glass */
+        /* Right padding (35px) makes room for the 'X' button */
+        padding: 10px 35px 10px 42px;
+        border-radius: 20px;
+        border: 1px solid #ddd;
+        outline: none;
+        background: #fff;
+        font-size: 14px;
+        transition: 0.2s ease;
+    }
+
+    .search-bar input:focus {
+        border-color: #f1c40f;
+        /* Using your Rodal Gold color */
+        box-shadow: 0 0 5px rgba(241, 196, 15, 0.1);
+    }
+
+    /* --- CLEAR BUTTON (The 'X') --- */
+    .search-bar .clear-search {
+        position: absolute;
+        right: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #888;
+        text-decoration: none;
+        font-size: 14px;
+        z-index: 5;
+        transition: 0.2s;
+    }
+
+    .search-bar .clear-search:hover {
+        color: #e74c3c;
+        /* Turns red when hovering to clear */
+    }
+
+
+    /* Prevent inherited styles */
+    .search-bar .clear-search i,
+    .search-bar .search-btn i {
+        position: static;
+        transform: none;
+        color: inherit;
+    }
+
+    .user-actions {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .user-actions button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 26px;
+        color: var(--text-dark);
+        padding: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* DROPDOWN MENU */
+    .user-profile-wrapper {
+        position: relative;
+    }
+
+  
+    .dropdown-menu.active {
+        display: block;
+        /* Shows when button is clicked */
+    }
+
+    .dropdown-header {
+        padding: 10px 20px;
+        line-height: 1.4;
+    }
+
+    .dropdown-header span {
+        font-size: 12px;
+        color: #888;
+    }
+
+    .dropdown-menu hr {
+        border: none;
+        border-top: 1px solid #eee;
+        margin: 8px 0;
+    }
+
+    .dropdown-menu a {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 20px;
+        text-decoration: none;
+        color: var(--text-dark);
+        transition: 0.2s;
+    }
+
+    .dropdown-menu a:hover {
+        background: var(--bg-yellow);
+    }
+
+    .dropdown-menu a.logout-link {
+        color: #e74c3c;
+        font-weight: bold;
+    }
+
+
+
+    /* Cards ng profit status */
+
+
+
+    /*profit status cards hanggang dito*/
+
+    .graph-placeholder {
+        margin-top: 100px;
+        text-align: center;
+        font-weight: 900;
+        width: 200px;
+    }
+
+    /* History Table Styles */
+    .large-search {
+        background: #E6B800;
+        border-radius: 10px;
+        padding: 5px 15px;
+        display: flex;
+        align-items: center;
+        width: 400px;
+    }
+
+    .large-search input {
+        background: transparent;
+        border: none;
+        padding: 10px;
+        width: 100%;
+        color: #000;
+        font-weight: bold;
+    }
+
+    .large-search input::placeholder {
+        color: rgba(0, 0, 0, 0.5);
+    }
+
+    /* Tagline Styling */
+    .tagline {
+        margin-top: 30px;
+        font-weight: 500;
+        max-width: 250px;
+        /* Increased width to prevent awkward wrapping */
+        line-height: 1.5;
+        color: #666;
+        font-style: italic;
+        /* Removed text-transform: lowercase for better readability */
+    }
+
+
+    /* Ensure dropdown is visible and positioned correctly */
+    .user-profile-wrapper {
+        position: relative;
+        display: inline-block;
+    }
+
+
+    .header-right,
+    .user-actions,
+    .user-profile-wrapper {
+        position: relative;
+        z-index: 9999;
+    }
+
+
+
+
+
+    /* notification css starts here */
+
+    .notification-container {
+        position: relative;
+    }
+
+    /* Red badge on the bell */
+    .notif-badge {
+        position: absolute;
+        top: -5px;
+        right: -2px;
+        background: #ff4757;
+        color: white;
+        font-size: 10px;
+        padding: 2px 5px;
+        border-radius: 50%;
+        border: 2px solid #fff;
+    }
+
+    /* Dropdown Menu */
+    .notif-dropdown {
+        display: none;
+        /* Hidden by default */
+        position: absolute;
+        top: 50px;
+        right: 0;
+        width: 300px;
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+        z-index: 1000;
+        overflow: hidden;
+    }
+
+    .notif-dropdown.active {
+        display: block;
+        animation: fadeIn 0.3s ease;
+    }
+
+    .notif-header {
+        padding: 15px;
+        background: #f8f9fa;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #eee;
+    }
+
+    .notif-header h3 {
+        font-size: 14px;
+        margin: 0;
+    }
+
+    .notif-header span {
+        font-size: 11px;
+        color: #E6B800;
+        cursor: pointer;
+    }
+
+    .notif-list {
+        list-style: none;
+        max-height: 300px;
+        overflow-y: auto;
+    }
+
+    .notif-list li {
+        padding: 12px 15px;
+        display: flex;
+        gap: 12px;
+        border-bottom: 1px solid #f1f1f1;
+        cursor: pointer;
+    }
+
+    .notif-list li:hover {
+        background: #fdfaf0;
+    }
+
+    .notif-list li.unread {
+        background: #fffdf5;
+        border-left: 3px solid #E6B800;
+    }
+
+    .notif-list li i {
+        margin-top: 3px;
+        color: #E6B800;
+    }
+
+    .notif-list li p {
+        font-size: 13px;
+        margin: 0;
+    }
+
+    .notif-list li span {
+        font-size: 11px;
+        color: #999;
+    }
+
+    .notif-footer {
+        background-color: #fdfdfd;
+        border-top: 1px solid #eee;
+        padding: 0;
+        /* Remove padding here so the link fills the space */
+        text-align: center;
+        transition: background 0.3s ease;
+    }
+
+    .notif-footer a {
+        display: block;
+        /* Makes the entire footer area clickable */
+        padding: 12px;
+        color: #E6B800;
+        /* Matching your theme gold */
+        font-size: 13px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.2s ease-in-out;
+    }
+
+    .notif-footer a i {
+        margin-left: 5px;
+        font-size: 11px;
+        transition: transform 0.2s ease;
+    }
+
+    /* Hover Effect: Background changes and the arrow moves */
+    .notif-footer:hover {
+        background-color: #fff9e6;
+        /* Very light gold tint */
+    }
+
+    .notif-footer a:hover {
+        color: #b38f00;
+        /* Darker gold */
+    }
+
+    .notif-footer a:hover i {
+        transform: translateX(3px);
+        /* Subtle animation on the arrow */
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* notification css ends here */
+
+    .action-group {
+        display: flex;
+        gap: 8px;
+        /* Even spacing between buttons */
+        align-items: center;
+        /* Vertically center buttons in the row */
+        justify-content: center;
+        /* Horizontally center buttons in the cell */
+    }
+
+    /* BUTTON */
+    .account-btn {
+        pointer-events: auto;
+    }
+
+    .account-btn i {
+        pointer-events: none;
+    }
+
+    .delete-btn,
+    .add-btn,
+    .sell-btn {
+        padding: 8px 12px;
+        border-radius: 4px;
+        border: none;
+        cursor: pointer;
+        white-space: nowrap;
+        /* Prevents text from wrapping */
+        flex: 1;
+        /* Optional: makes buttons equal width */
+    }
+
+    .delete-btn {
+        background: #fff0e5;
+        color: #e74c3c;
+    }
+
+    .delete-btn:hover {
+        background: #e74c3c;
+        color: #fff0e5;
+    }
+
+    .sell-btn {
+        background: #fff0e5;
+        color: #ff6b00;
+    }
+
+    .sell-btn:hover {
+        background: #ff6b00;
+        color: #fff;
+    }
+
+    .add-btn {
+        background: #e8f5e9;
+        color: #2e7d32;
+    }
+
+    .add-btn:hover {
+        background: #2e7d32;
+        color: #fff;
+    }
+
+
+    /* << DASHBOARD CSS (GRAPH, STOCK, & CARD-STATS) STARTS HERE >> */
+
+    /* DASHBOARD GRID */
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 20px;
+        margin-top: 20px;
+        align-items: stretch;
+    }
+
+    /* STATS CARDS [cards ito ng dashboard] STARS HERE*/
+
+    .stats-container {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+
+    .stat-card {
+        background: var(--card-yellow);
+        padding: 20px;
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+
+        /* Initial state: subtle shadow */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+        /* Critical: Transition for smooth hover effect */
+        transition: all 0.3s ease-in-out;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    /* Hover State */
+    .stat-card:hover {
+        /* Lift the card up */
+        transform: translateY(-3px);
+
+        /* Increase shadow to make it look higher */
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .card-icon {
+        font-size: 30px;
+        color: var(--accent);
+    }
+
+    .profit-layout {
+        display: flex;
+        gap: 40px;
+        margin-top: 20px;
+    }
+
+    .stats-column {
+        flex: 2;
+    }
+
+    .graph-side {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+    }
+
+    .stat-group h2 {
+        font-size: 2rem;
+        margin-bottom: 10px;
+        font-weight: 800;
+    }
+
+    .card-row {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 40px;
+        align-items: center;
+    }
+
+    /* STAT-CARD CSS ENDS HERE */
+
+    /* GRAPH SECTION STARS HERE */
+    /* Container for the whole graph area */
+    .graph-section {
+        background: white;
+        padding: 25px;
+        border-radius: 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .graph-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .graph-header h3 {
+        margin: 0;
+        font-size: 1.2rem;
+        color: #222;
+    }
+
+    /* The Toggle Buttons Area */
+    .chart-toggle {
+        background: #f5f5f5;
+        padding: 4px;
+        border-radius: 8px;
+        display: flex;
+    }
+
+    .chart-btn {
+        border: none;
+        background: transparent;
+        padding: 6px 15px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.8rem;
+        font-weight: 600;
+        transition: 0.3s;
+    }
+
+    .chart-btn.active {
+        background: #f1c40f;
+        /* Rodal Gold */
+        color: #333;
+    }
+
+    /* The Canvas Wrapper - This is where the stretch happens */
+    .chart-container {
+        position: relative;
+        height: 400px;
+        /* Forces vertical height */
+        width: 100%;
+        /* Forces horizontal width */
+    }
+
+    /* GRAPH SECTION ENDS HERE */
+
+
+    /* STOCK PANEL STARTS HERE */
+    .stock-panel {
+        background: #fff;
+        padding: 22px;
+        border-radius: 16px;
+        box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        height: 100%;
+    }
+
+    /* Header */
+    .stock-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 18px;
+    }
+
+    .stock-header h3 {
+        font-size: 18px;
+        font-weight: 700;
+        color: #222;
+        margin: 0;
+    }
+
+    .stock-badge {
+        background: #eafaf1;
+        color: #27ae60;
+        padding: 5px 10px;
+        border-radius: 30px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    /* Stock List */
+    .stock-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    /* Stock Card */
+    .stock-item-card {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #fafafa;
+        padding: 14px 15px;
+        border-radius: 12px;
+        border: 1px solid #f1f1f1;
+        transition: 0.3s ease;
+    }
+
+    .stock-item-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 12px rgba(0, 0, 0, 0.06);
+    }
+
+    .stock-info {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .stock-name {
+        font-size: 14px;
+        font-weight: 600;
+        color: #222;
+    }
+
+    .stock-info small {
+        font-size: 12px;
+        color: #888;
+        margin-top: 3px;
+    }
+
+    /* Status Pills */
+    .stock-status {
+        padding: 6px 12px;
+        border-radius: 30px;
+        font-size: 11px;
+        font-weight: 700;
+    }
+
+    .stock-status.critical {
+        background: #ffeaea;
+        color: #e74c3c;
+    }
+
+    .stock-status.low {
+        background: #fff4df;
+        color: #f39c12;
+    }
+
+    .stock-status.good {
+        background: #eafaf1;
+        color: #27ae60;
+    }
+
+    /* Footer */
+    .stock-footer {
+        margin-top: 18px;
+        text-align: center;
+    }
+
+    .stock-footer a {
+        text-decoration: none;
+        font-size: 13px;
+        color: var(--accent);
+        font-weight: 600;
+    }
+
+    .stock-footer a:hover {
+        text-decoration: underline;
+    }
+
+    /* Warning Card */
+    .warning-card {
+        border-left: 5px solid #f39c12;
+    }
+
+    .warning-card .card-icon {
+        color: #f39c12;
+    }
+
+    /* MOBILE */
+    @media(max-width:900px) {
+        .dashboard-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* STOCK PANEL STARTS ENDS HERE */
+
+    /* << DASHBOARD CSS (GRAPH, STOCK, ETC.) ENDS HERE >> */
+
+
+
+    /* << PRODUCTS CSS STARTS HERE >> */
+
+    /*TOP HEADER CATEGORY FILTER CSS*/
+
+    /* CATEGORY */
+    .category-section {
+        margin-top: 25px;
+    }
+
+    .category-title {
+        font-size: 22px;
+        margin-bottom: 18px;
+        color: #222;
+        font-weight: 700;
+    }
+
+    /* CATEGORY */
+
+    .modern-dropdown {
+        position: relative;
+        width: 230px;
+        font-family: 'Poppins', sans-serif;
+        /* Applied modern font */
+        user-select: none;
+    }
+
+    .dropdown-trigger {
+        background: #fff;
+        border: 2px solid #edf2f7;
+        padding: 10px 18px;
+        border-radius: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+
+        /* Typography improvements */
+        font-size: 13px;
+        font-weight: 600;
+        color: #2d3748;
+        letter-spacing: 0.3px;
+
+        transition: all 0.3s ease;
+    }
+
+    .dropdown-trigger:hover {
+        border-color: #FAF089;
+        /* Light yellow border */
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        /* Optional: Adds a subtle lift effect */
+    }
+
+    .dropdown-menu {
+        position: absolute;
+        /* Starts exactly at the bottom edge of the trigger */
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background: #fff;
+
+        /* Restored: Full curves on all 4 corners */
+        border-radius: 15px;
+
+        /* A slightly stronger shadow helps the curvy top stand out 
+       against the trigger box above it */
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+
+        list-style: none;
+        padding: 8px 0;
+        /* Adds a little breathing room at the top and bottom */
+        margin: 0;
+        display: none;
+        z-index: 1000;
+
+        /* Important: We keep the border but keep it subtle */
+        border: 1px solid #edf2f7;
+
+        /* We allow overflow: hidden to ensure the yellow hover 
+       doesn't break the new top curves */
+        overflow: hidden;
+    }
+
+    .dropdown-menu li {
+        padding: 12px 18px;
+        cursor: pointer;
+
+        /* Typography for categories */
+        font-size: 13px;
+        font-weight: 500;
+        color: #4a5568;
+        letter-spacing: 0.2px;
+
+        transition: all 0.2s ease;
+    }
+
+    /* Light Yellow Hover with Darker Text */
+    .dropdown-menu li:hover {
+        background: #fff9c4;
+        color: #856404;
+        padding-left: 22px;
+        /* Subtle slide effect on hover */
+    }
+
+    /* Active State */
+    .dropdown-menu li.active {
+        background: #fef9c3;
+        color: #856404;
+        font-weight: 700;
+    }
+
+    .modern-dropdown.is-open .dropdown-menu {
+        display: block;
+    }
+
+    /* GRID */
+    .product-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 20px;
+    }
+
+    /* MODERN CARD */
+    .modern-card {
+        background: #fff;
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        transition: 0.3s ease;
+        padding: 15px;
+    }
+
+    .modern-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 14px 28px rgba(0, 0, 0, 0.12);
+    }
+
+    /* IMAGE */
+    .product-img-container {
+        background: #f4f6f8;
+        border-radius: 15px;
+        height: 180px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+    .product-img-container img {
+        max-width: 130px;
+        max-height: 130px;
+        object-fit: contain;
+    }
+
+    /* INFO */
+    .product-name {
+        font-size: 20px;
+        font-weight: 700;
+        margin-bottom: 5px;
+        color: #111;
+    }
+
+    .product-category {
+        font-size: 13px;
+        color: #888;
+    }
+
+    /* STOCK */
+    .stock-row {
+        display: flex;
+        justify-content: space-between;
+        margin: 15px 0 10px;
+        font-size: 14px;
+    }
+
+    .available {
+        color: #0a9f4d;
+        font-weight: 600;
+    }
+
+    .sold {
+        color: #ff6b00;
+        font-weight: 600;
+    }
+
+    /* PRICE */
+    .price-row {
+        margin-bottom: 15px;
+    }
+
+    .price {
+        font-size: 24px;
+        font-weight: bold;
+        color: #2d6cdf;
+    }
+
+    /* QUANTITY */
+    .quantity-box {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 15px;
+    }
+
+    .quantity-box button {
+        width: 35px;
+        height: 35px;
+        border: none;
+        border-radius: 10px;
+        background: #2d6cdf;
+        color: white;
+        font-size: 18px;
+        cursor: pointer;
+    }
+
+    .quantity-box input {
+        width: 60px;
+        text-align: center;
+        height: 35px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+    }
+
+    /* GRID */
+
+    .grid-thead {
+        background-color: #f8f9fa;
+        /* Give it a light gray background */
+    }
+
+    .grid-thead th {
+        padding: 14px 16px;
+        text-align: left;
+        font-weight: 600;
+        color: #333;
+        border-bottom: 2px solid #eee;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    /* 3. Explicitly round the top-left and top-right cells */
+    .grid-thead th:first-child {
+        border-top-left-radius: 12px;
+    }
+
+    .grid-thead th:last-child {
+        border-top-right-radius: 12px;
+    }
+
+    .grid-table {
+        width: 100%;
+        border-collapse: collapse;
+        border: none;
+        /* Remove the heavy outer border */
+        background: #fff;
+    }
+
+    /* Header Styling */
+    .grid-table th {
+        background: #fdf2cc;
+        /* Softer version of your gold/yellow */
+        color: #856404;
+        /* Darker text for better contrast */
+        padding: 16px;
+        border-bottom: 2px solid #E6B800;
+        /* Only a bottom border for a cleaner look */
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.05em;
+        text-align: left;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    /* TABLE BODY ROWS */
+    .grid-table tbody tr {
+        background-color: #ffffff;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
+    }
+
+    /* Rounded corners for the start and end of each row */
+    .grid-table tbody tr td:first-child {
+        border-top-left-radius: 12px;
+        border-bottom-left-radius: 12px;
+    }
+
+    .grid-table tbody tr td:last-child {
+        border-top-right-radius: 12px;
+        border-bottom-right-radius: 12px;
+    }
+
+    /* Cell Styling */
+    .grid-table td {
+        border-bottom: 1px solid #eee;
+        /* Light lines between rows only */
+        padding: 14px 16px;
+        color: #444;
+        font-size: 0.95rem;
+    }
+
+    .grid-table tbody tr:hover {
+        background-color: #fff9c4;
+        /* A soft, modern light yellow */
+        transition: background-color 0.2s ease;
+    }
+
+    /* Last row doesn't need a border */
+    .grid-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .pagination-container {
+        display: flex;
+        justify-content: center;
+        margin: 10px 0 5px 0;
+    }
+
+    .pagination {
+        display: flex;
+        gap: 5px;
+        background: #fff;
+        padding: 10px 15px;
+        border-radius: 50px;
+        /* Soft shadow to make the yellow pop */
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    .pagination a {
+        color: #555;
+        padding: 8px 16px;
+        text-decoration: none;
+        border: 1px solid transparent;
+        border-radius: 50px;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 40px;
+    }
+
+    /* Hover State - Using a soft yellow tint */
+    .pagination a:hover:not(.active) {
+        background-color: #fffde7;
+        /* Very light yellow */
+        color: #f1c40f;
+        /* Rodal Yellow */
+        border-color: #f1c40f;
+        transform: translateY(-2px);
+    }
+
+    /* Active Page State - Rodal Yellow Gradient */
+    .pagination a.active {
+        /* Gradient from a bright yellow to a slightly deeper gold */
+        background: linear-gradient(135deg, #f1c40f, #f1c40f);
+        color: #fff;
+        box-shadow: 0 4px 10px rgba(241, 196, 15, 0.4);
+        pointer-events: none;
+        font-weight: 700;
+    }
+
+    /* Next/Prev Arrow Specifics */
+    .pagination a:first-child,
+    .pagination a:last-child {
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 12px;
+        letter-spacing: 0.5px;
+        padding: 8px 20px;
+        color: #f39c12;
+        /* Keep arrows colored even when not hovered */
+    }
+
+    /* pagination css ends here */
+
+    .top-bar {
+        display: flex;
+        align-items: center;
+        /* Pushes the Pagination to the left and Category to the right */
+        justify-content: space-between;
+        margin-bottom: 5px;
+        flex-wrap: wrap;
+        width: 100%;
+    }
+
+
+    .top-bar .category-title {
+        margin-right: auto;
+        font-size: 18px;
+        font-weight: 700;
+        color: #222;
+    }
+
+    /* Improved Filter Box */
+    .top-bar #categoryFilter {
+        margin-left: auto;
+        padding: 10px 42px 10px 14px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        background: #fff;
+        font-size: 14px;
+        font-weight: 500;
+        color: #333;
+        cursor: pointer;
+        outline: none;
+        min-width: 190px;
+
+        /* Custom Arrow */
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-image: url("data:image/svg+xml;utf8,<svg fill='%23666' height='20' viewBox='0 0 20 20' width='20' xmlns='http://www.w3.org/2000/svg'><path d='M5.5 7.5l4.5 4.5 4.5-4.5'/></svg>");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        background-size: 16px;
+
+        transition: all 0.25s ease;
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.04);
+    }
+
+    /* Hover */
+    .top-bar #categoryFilter:hover {
+        border-color: var(--accent);
+        box-shadow: 0 5px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    /* Focus */
+    .top-bar #categoryFilter:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.12);
+    }
+
+    /* Quantity Box */
+    .quantity-box {
+        display: flex;
+        justify-content: center;
+        gap: 5px;
+    }
+
+    .quantity-box button {
+        width: 30px;
+        height: 30px;
+        border: none;
+        background: #f1c40f;
+        color: white;
+        cursor: pointer;
+        border-radius: 6px;
+        transition: 0.2s ease;
+    }
+
+    .quantity-box button:hover {
+        background: #caa200;
+    }
+
+    .quantity-box input {
+        width: 50px;
+        text-align: center;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+    }
+
+    /* TABLE CONTAINER */
+    .category-section {
+        background: #fff;
+        padding: 20px;
+        border-radius: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+        margin-top: 10px;
+    }
+
+    /* THE TABLE */
+    .grid-table {
+        width: 100%;
+        border-collapse: separate;
+        /* REDUCE THIS: The second number (8px) is top/bottom spacing for rows */
+        border-spacing: 0 4px;
+        margin-top: 0;
+    }
+
+    /* HEADERS */
+    .grid-table thead tr {
+        background-color: transparent;
+    }
+
+    .grid-table th {
+        padding: 15px 20px;
+        text-align: left;
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #000000;
+        font-weight: 600;
+        border: none;
+    }
+
+    /* BADGES AND STATUSES */
+    .available-text {
+        color: #0a9f4d;
+        background: #e6f6ed;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 13px;
+    }
+
+    .price-text {
+        font-weight: 700;
+        color: #2d6cdf;
+        font-size: 16px;
+    }
+
+    /* ACTION GROUP (Add/Sell Buttons) */
+    .action-group {
+        display: flex;
+        gap: 8px;
+    }
+
+    .action-group button {
+        border: none;
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.2s;
+        font-size: 13px;
+    }
+
+    /* INPUT STYLES IN TABLE */
+    .grid-table input[type="number"],
+    .grid-table input[type="date"] {
+        border: 1px solid #e0e0e0;
+        padding: 6px;
+        border-radius: 6px;
+        outline: none;
+        transition: 0.2s;
+    }
+
+    .grid-table input:focus {
+        border-color: #2d6cdf;
+        box-shadow: 0 0 0 3px rgba(45, 108, 223, 0.1);
+    }
+
+
+    /* << PRODUCTS CSS ENDS HERE >> */
+
+
+    /* << PROFIT-STATUS CSS STARTS HERE >> */
+
+    /* FULL WIDTH PROFIT SECTION */
+    .profit-layout {
+        width: 100%;
+        padding: 25px 30px;
+        margin-top: 20px;
+        box-sizing: border-box;
+    }
+
+    /* FULL PAGE CONTENT BOX */
+    .stat-group {
+        width: 100%;
+        background: #ffffff;
+        padding: 28px;
+        border-radius: 20px;
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.06);
+        box-sizing: border-box;
+    }
+
+    /* HEADER */
+    .section-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 11px;
+    }
+
+    /* TITLES */
+    .stat-group h2 {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 800;
+        letter-spacing: 1px;
+        color: #1f2937;
+    }
+
+    /* YEAR FILTER */
+    .year-selector {
+        display: inline-flex;
+        align-items: center;
+        padding: 0;
+        background: linear-gradient(135deg, #ffffff, #f8fafc);
+        border: 2px solid #edf2f7;
+        border-radius: 14px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        transition: all 0.25s ease;
+    }
+
+    .year-selector:hover {
+        border-color: #FAF089;
+        /* Light yellow border */
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        /* Optional: Adds a subtle lift effect */
+    }
+
+    /* SELECT DESIGN */
+    .year-selector select {
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+
+        border: none;
+        outline: none;
+        background: transparent;
+
+        padding: 12px 42px 12px 16px;
+        font-size: 15px;
+        font-weight: 700;
+        color: #1f2937;
+        cursor: pointer;
+        border-radius: 14px;
+        min-width: 95px;
+
+        /* Custom dropdown arrow */
+        background-image: url("data:image/svg+xml;utf8,<svg fill='%23666' height='20' viewBox='0 0 20 20' width='20' xmlns='http://www.w3.org/2000/svg'><path d='M5.5 7.5l4.5 4.5 4.5-4.5'/></svg>");
+        background-repeat: no-repeat;
+        background-position: right 14px center;
+        background-size: 14px;
+    }
+
+    /* Focus effect */
+    .year-selector select:focus {
+        background-color: #f9fafb;
+    }
+
+    /* CARD ROW FULL WIDTH */
+    .card-row {
+        display: flex;
+        gap: 20px;
+        width: 100%;
+    }
+
+    /* BOTH BOXES */
+    .yellow-box,
+    .green-box {
+        flex: 1;
+        padding: 28px;
+        border-radius: 18px;
+        box-shadow: 0 10px 22px rgba(0, 0, 0, 0.06);
+        transition: 0.25s ease;
+
+        /* SAME TEXT ALIGNMENT */
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
+        text-align: left;
+    }
+
+    .yellow-box:hover,
+    .green-box:hover {
+        transform: translateY(-4px);
+    }
+
+    /* REVENUE */
+    .yellow-box {
+        background: linear-gradient(135deg, #facc15, #eab308);
+        color: #111827;
+    }
+
+    /* PROFIT */
+    .green-box {
+        background: linear-gradient(135deg, #22c55e, #16a34a);
+        color: #ffffff;
+    }
+
+    /* TEXT */
+    .yellow-box span,
+    .green-box span {
+        display: block;
+        font-size: 12px;
+        font-weight: 700;
+        margin-bottom: 10px;
+        letter-spacing: 1px;
+        opacity: .9;
+    }
+
+    .yellow-box strong,
+    .green-box strong {
+        font-size: 30px;
+        font-weight: 800;
+        line-height: 1.2;
+    }
+
+    /* << PROFIT STATUS CSS ENDS HERE >> */
+
+    /* ALL NOTIFICATIONS CSS */
+
+    /* ALL NOTIFICATIONS - RODAL THEME */
+
+
+    .status-unread {
+        background-color: var(--card-yellow) !important;
+        /* Your signature yellow */
+        border-left: 5px solid var(--accent) !important;
+        /* Gold/Yellow bar instead of blue */
+    }
+
+    .status-read {
+        background-color: transparent;
+        opacity: 0.7;
+    }
+
+    .badge {
+        padding: 5px 10px;
+        border-radius: 20px;
+        /* Pill shape */
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    /* Unread Badge - Dark text on Yellow */
+    .status-unread .badge {
+        background: var(--accent);
+        color: var(--text-dark);
+    }
+
+    /* Read Badge - Subtle gray */
+    .status-read .badge {
+        background: #f0f0f0;
+        color: #999;
+    }
+
+    /* Back Button matching your theme */
+    .back-btn {
+        background-color: var(--card-yellow);
+        border: 1px solid var(--accent);
+        color: var(--text-dark);
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: 0.3s;
+    }
+
+    .back-btn:hover {
+        background-color: var(--accent);
+        transform: translateY(-2px);
+    }
+
+    .grid-table thead tr {
+        background-color: var(--accent);
+        /* Uses your Gold/Yellow accent */
+        color: var(--text-dark);
+    }
+
+    .grid-table th {
+        padding: 15px;
+        text-align: left;
+    }
+
+    /* ADD PRODUCT BUTTON */
+    .add-product-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        background: var(--accent);
+        color: #111;
+        border: none;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: 0 3px 10px rgba(241, 196, 15, 0.35);
+        white-space: nowrap;
+    }
+
+    .add-product-btn:hover {
+        background: #d4ac0d;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(241, 196, 15, 0.45);
+    }
+
+    /* MODAL OVERLAY */
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+        backdrop-filter: blur(3px);
+        z-index: 9999;
+        justify-content: center;
+        align-items: center;
+        animation: fadeIn 0.2s ease;
+    }
+
+    .modal-overlay.active {
+        display: flex;
+    }
+
+    /* MODAL CARD */
+    .modal-card {
+        background: #fff;
+        border-radius: 20px;
+        width: 520px;
+        max-width: 95vw;
+        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.18);
+        animation: slideUp 0.25s ease;
+        overflow: hidden;
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    /* MODAL HEADER */
+    .modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 22px 24px 18px;
+        border-bottom: 2px solid #f5f5f5;
+        background: var(--bg-yellow);
+    }
+
+    .modal-header h2 {
+        font-size: 18px;
+        font-weight: 800;
+        color: #1a1a1a;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 0;
+    }
+
+    .modal-header h2 i {
+        color: var(--accent);
+        font-size: 20px;
+    }
+
+    .modal-close {
+        background: none;
+        border: none;
+        font-size: 18px;
+        color: #999;
+        cursor: pointer;
+        padding: 4px 8px;
+        border-radius: 6px;
+        transition: 0.2s;
+        line-height: 1;
+    }
+
+    .modal-close:hover {
+        background: #f0f0f0;
+        color: #333;
+    }
+
+    /* MODAL BODY */
+    .modal-body {
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        flex: 1;
+    }
+
+    .form-row {
+        display: flex;
+        gap: 14px;
+    }
+
+    .form-group label {
+        font-size: 13px;
+        font-weight: 700;
+        color: #444;
+        letter-spacing: 0.3px;
+    }
+
+    .required {
+        color: #e74c3c;
+    }
+
+    .form-group input,
+    .form-group select {
+        padding: 10px 14px;
+        border: 1.5px solid #e0e0e0;
+        border-radius: 10px;
+        font-size: 14px;
+        color: #333;
+        outline: none;
+        background: #fafafa;
+        transition: all 0.2s ease;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+        border-color: var(--accent);
+        background: #fff;
+        box-shadow: 0 0 0 3px rgba(241, 196, 15, 0.15);
+    }
+
+    .form-group input::placeholder {
+        color: #bbb;
+    }
+
+    /* MODAL FOOTER */
+    .modal-footer {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+        padding: 16px 24px 22px;
+        border-top: 1px solid #f0f0f0;
+        background: #fafafa;
+    }
+
+    .btn-cancel {
+        padding: 10px 22px;
+        border: 1.5px solid #ddd;
+        background: #fff;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #666;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+    .btn-cancel:hover {
+        background: #f5f5f5;
+        border-color: #bbb;
+    }
+
+    .btn-save {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 10px 24px;
+        background: var(--accent);
+        color: #111;
+        border: none;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: 0 3px 10px rgba(241, 196, 15, 0.3);
+    }
+
+    .btn-save:hover {
+        background: #d4ac0d;
+        transform: translateY(-1px);
+        box-shadow: 0 5px 14px rgba(241, 196, 15, 0.4);
+    }
+
+    /* ── Edit & Archive action buttons ── */
+    .edit-btn {
+        background: #1565c0;
+        color: #fff;
+        border: none;
+        padding: 5px 11px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 12px;
+        transition: background 0.2s;
+    }
+
+    .edit-btn:hover {
+        background: #0d47a1;
+    }
+
+    .archive-btn {
+        background: #e65100;
+        color: #fff;
+        border: none;
+        padding: 5px 11px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 12px;
+        transition: background 0.2s;
+    }
+
+    .archive-btn:hover {
+        background: #bf360c;
+    }
+
+    /* ── Edit Modal ── */
+    #editProductOverlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #editProductOverlay.active {
+        display: flex;
+    }
+
+
+
+
+    .action-menu-container {
+        position: relative;
+        display: inline-block;
+    }
+
+    .action-trigger-btn {
+        background: #e9ecef;
+        border: none;
+        padding: 8px 12px;
+        cursor: pointer;
+        border-radius: 6px;
+        color: #333;
+    }
+
+    /* Show class for JS */
+    .dropdown-menu.show {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .dropdown-menu a {
+        color: #444;
+        padding: 10px 0;
+        text-decoration: none;
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        transition: 0.2s;
+    }
+
+    .dropdown-menu a:hover {
+        background-color: #f8f9fa;
+        color: #007bff;
+    }
+
+    .dropdown-menu a.archive-link:hover {
+        color: #dc3545;
+        background-color: #fff5f5;
+    }
+    
