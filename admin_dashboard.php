@@ -32,12 +32,10 @@ switch ($sort) {
         $orderBy = "st.transaction_type DESC, st.transaction_date DESC";
         break;
     case 'newest':
-    default:
+        default:
         $orderBy = "st.transaction_id DESC";
         break;
 }
-
-
 // 4. Setup Pagination
 $limit = 10;
 $page = isset($_GET['page']) ? max(1, (int) $_GET['page']) : 1;
