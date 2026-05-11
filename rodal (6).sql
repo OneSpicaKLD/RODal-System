@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3307
--- Generation Time: May 11, 2026 at 07:34 AM
+-- Generation Time: May 11, 2026 at 02:20 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -178,7 +178,8 @@ INSERT INTO `notification` (`id`, `product_id`, `transaction_id`, `title`, `mess
 (106, 1000, 56, 'Expiry Warning', 'Expiring soon: CREAM-O 3PCS [Batch #56] (1 units) on 2026-05-29', 'read', '2026-05-08 09:50:29'),
 (107, 1000, 42, 'Expiry Warning', 'Expiring soon: CREAM-O 3PCS [Batch #42] (1 units) on 2026-06-08', 'read', '2026-05-09 05:55:04'),
 (108, 1007, 58, 'Low Stock', 'SKYFLAKES CRACKERS 3PCS is running low (3 left).', 'unread', '2026-05-10 16:38:44'),
-(109, 1007, 59, 'Low Stock', 'SKYFLAKES CRACKERS 3PCS is running low (2 left).', 'unread', '2026-05-10 16:39:12');
+(109, 1007, 59, 'Low Stock', 'SKYFLAKES CRACKERS 3PCS is running low (2 left).', 'unread', '2026-05-10 16:39:12'),
+(110, 1007, 60, 'Low Stock', 'SKYFLAKES CRACKERS 3PCS is running low (3 left).', 'unread', '2026-05-11 08:31:29');
 
 -- --------------------------------------------------------
 
@@ -314,7 +315,7 @@ CREATE TABLE `stock_transaction` (
   `transaction_type` enum('IN','OUT','ADJUSTMENT') NOT NULL,
   `quantity` int(11) NOT NULL,
   `transaction_date` datetime NOT NULL,
-  `buy_amount` decimal(10,2) DEFAULT NULL,
+  `buy_amount` decimal(10,2) DEFAULT 0.00,
   `sell_amount` decimal(11,2) DEFAULT 0.00,
   `expiry_date` date DEFAULT NULL,
   `related_tid` int(11) DEFAULT NULL
@@ -327,76 +328,84 @@ CREATE TABLE `stock_transaction` (
 INSERT INTO `stock_transaction` (`transaction_id`, `product_id`, `transaction_type`, `quantity`, `transaction_date`, `buy_amount`, `sell_amount`, `expiry_date`, `related_tid`) VALUES
 (1, 1000, 'IN', 2, '2026-04-23 17:24:28', 16.00, 0.00, NULL, NULL),
 (2, 1000, 'IN', 5, '2026-04-23 17:25:01', 40.00, 0.00, NULL, NULL),
-(3, 1000, 'OUT', 3, '2026-04-23 17:25:20', NULL, 30.00, NULL, NULL),
+(3, 1000, 'OUT', 3, '2026-04-23 17:25:20', 0.00, 30.00, NULL, NULL),
 (4, 1013, 'IN', 9, '2026-05-05 18:44:18', 180.00, 0.00, NULL, NULL),
 (5, 1017, 'IN', 13, '2026-05-05 18:47:02', 338.00, 0.00, '2026-06-01', NULL),
-(6, 1000, 'IN', 3, '2026-05-06 07:03:17', 24.00, NULL, NULL, NULL),
-(7, 1000, 'OUT', 2, '2026-05-06 07:03:27', NULL, 20.00, NULL, NULL),
-(8, 1000, 'IN', 4, '2026-05-06 07:09:59', 32.00, NULL, '2029-06-05', NULL),
-(9, 1000, 'OUT', 3, '2026-05-06 08:32:59', NULL, 30.00, NULL, NULL),
-(10, 1001, 'IN', 5, '2026-05-06 09:25:04', 30.00, NULL, '2026-06-01', NULL),
-(11, 1000, 'OUT', 4, '2026-05-06 09:30:50', NULL, 40.00, NULL, NULL),
-(12, 1000, 'IN', 3, '2026-05-06 09:55:39', 24.00, NULL, '2026-07-01', NULL),
-(13, 1002, 'IN', 15, '2026-05-06 10:03:10', 93.00, NULL, '2026-06-03', NULL),
-(14, 1000, 'IN', 1000, '2026-05-06 10:06:15', 8000.00, NULL, NULL, NULL),
-(15, 1000, 'OUT', 900, '2026-05-06 10:06:26', NULL, 9000.00, NULL, NULL),
-(16, 1000, 'OUT', 100, '2026-05-06 10:09:02', NULL, 1000.00, NULL, NULL),
-(17, 1005, 'IN', 2, '2026-05-06 14:05:34', 0.00, NULL, '2026-06-11', NULL),
-(18, 1006, 'IN', 11, '2026-05-06 14:13:09', 94.00, NULL, '2026-06-01', NULL),
-(19, 1005, 'OUT', 1, '2026-05-06 14:15:35', NULL, 8.00, NULL, NULL),
-(20, 1001, 'OUT', 2, '2026-05-06 14:32:46', NULL, 16.00, NULL, NULL),
-(21, 1000, 'IN', 1, '2026-05-06 14:33:18', 8.00, NULL, '2026-05-31', NULL),
-(22, 1000, 'IN', 1, '2026-05-06 16:56:52', 8.00, NULL, NULL, NULL),
-(23, 1000, 'OUT', 1, '2026-05-06 16:56:56', NULL, 10.00, NULL, NULL),
-(24, 1000, 'IN', 1, '2026-05-06 16:57:13', 8.00, NULL, NULL, NULL),
-(25, 1000, 'IN', 1, '2026-05-07 21:27:57', 8.00, NULL, NULL, NULL),
-(26, 1000, 'IN', 1, '2026-05-08 09:34:42', 8.00, NULL, NULL, NULL),
-(27, 1000, 'OUT', 1, '2026-05-08 09:58:36', NULL, 10.00, NULL, NULL),
-(28, 1000, 'IN', 2, '2026-05-08 10:31:40', 16.00, NULL, NULL, NULL),
-(29, 1000, 'OUT', 2, '2026-05-08 10:32:08', NULL, 20.00, NULL, NULL),
-(30, 1000, 'OUT', 2, '2026-05-08 10:59:57', NULL, 20.00, NULL, NULL),
-(31, 1000, 'OUT', 1, '2026-05-08 11:02:33', NULL, 10.00, NULL, NULL),
-(32, 1000, 'IN', 3, '2026-05-08 11:05:04', 24.00, NULL, NULL, NULL),
-(33, 1000, 'OUT', 1, '2026-05-08 11:06:15', NULL, 10.00, NULL, NULL),
-(34, 1000, 'OUT', 1, '2026-05-08 11:16:46', NULL, 10.00, NULL, NULL),
-(35, 1000, 'OUT', 1, '2026-05-08 11:22:53', NULL, 10.00, NULL, NULL),
-(36, 1000, 'IN', 3, '2026-05-08 11:26:52', 24.00, NULL, NULL, NULL),
-(37, 1006, 'OUT', 2, '2026-05-08 11:27:15', NULL, 20.00, NULL, NULL),
-(38, 1002, 'OUT', 2, '2026-05-08 11:28:54', NULL, 16.00, NULL, NULL),
-(39, 1005, 'IN', 1, '2026-05-08 15:32:40', 0.00, NULL, '2026-06-01', NULL),
-(40, 1005, 'IN', 1, '2026-05-08 15:33:09', 0.00, NULL, '2028-01-01', NULL),
-(41, 1008, 'IN', 21, '2026-05-08 15:33:39', 137.00, NULL, '2030-01-01', NULL),
-(42, 1000, 'IN', 1, '2026-05-08 15:39:07', 8.00, NULL, '2026-06-08', NULL),
-(43, 1000, 'IN', 1, '2026-05-08 15:42:58', 8.00, NULL, '2026-09-01', NULL),
-(44, 1000, 'OUT', 1, '2026-05-08 15:43:44', NULL, 10.00, NULL, NULL),
-(45, 1000, 'IN', 1, '2026-05-08 15:47:59', 8.00, NULL, '2026-05-09', NULL),
-(46, 1000, 'OUT', 1, '2026-05-08 17:09:54', NULL, 10.00, NULL, NULL),
-(47, 1007, 'IN', 5, '2026-05-08 17:12:50', 0.00, NULL, '2030-01-08', NULL),
-(48, 1007, 'OUT', 1, '2026-05-08 17:13:27', NULL, 8.00, NULL, NULL),
-(49, 1000, 'OUT', 10, '2026-05-08 17:17:21', NULL, 100.00, NULL, NULL),
-(50, 1001, 'OUT', 5, '2026-05-08 17:22:52', NULL, 40.00, NULL, NULL),
-(51, 1000, 'IN', 3, '2026-05-08 17:26:24', 24.00, NULL, '2027-08-19', NULL),
-(52, 1001, 'IN', 5, '2026-05-08 17:26:39', 30.00, NULL, '2032-01-01', NULL),
-(53, 1002, 'IN', 1, '2026-05-08 17:27:46', 6.00, NULL, '2026-05-09', NULL),
-(54, 1000, 'IN', 1, '2026-05-08 17:33:37', 8.00, NULL, '2026-06-01', NULL),
-(55, 1000, 'IN', 31, '2026-05-08 17:48:16', 248.00, NULL, NULL, NULL),
-(56, 1000, 'IN', 1, '2026-05-08 17:50:24', 8.00, NULL, '2026-05-29', 57),
-(57, 1000, 'ADJUSTMENT', -1, '2026-05-09 15:18:36', -8.00, -10.00, NULL, 56),
-(58, 1007, 'OUT', 1, '2026-05-11 00:38:39', NULL, 8.00, NULL, NULL),
-(59, 1007, 'OUT', 1, '2026-05-11 00:39:07', NULL, 9.00, NULL, NULL);
+(6, 1000, 'IN', 3, '2026-05-06 07:03:17', 24.00, 0.00, NULL, NULL),
+(7, 1000, 'OUT', 2, '2026-05-06 07:03:27', 0.00, 20.00, NULL, NULL),
+(8, 1000, 'IN', 4, '2026-05-06 07:09:59', 32.00, 0.00, '2029-06-05', NULL),
+(9, 1000, 'OUT', 3, '2026-05-06 08:32:59', 0.00, 30.00, NULL, NULL),
+(10, 1001, 'IN', 5, '2026-05-06 09:25:04', 30.00, 0.00, '2026-06-01', NULL),
+(11, 1000, 'OUT', 4, '2026-05-06 09:30:50', 0.00, 40.00, NULL, NULL),
+(12, 1000, 'IN', 3, '2026-05-06 09:55:39', 24.00, 0.00, '2026-07-01', NULL),
+(13, 1002, 'IN', 15, '2026-05-06 10:03:10', 93.00, 0.00, '2026-06-03', NULL),
+(14, 1000, 'IN', 1000, '2026-05-06 10:06:15', 8000.00, 0.00, NULL, NULL),
+(15, 1000, 'OUT', 900, '2026-05-06 10:06:26', 0.00, 9000.00, NULL, NULL),
+(16, 1000, 'OUT', 100, '2026-05-06 10:09:02', 0.00, 1000.00, NULL, NULL),
+(17, 1005, 'IN', 2, '2026-05-06 14:05:34', 0.00, 0.00, '2026-06-11', NULL),
+(18, 1006, 'IN', 11, '2026-05-06 14:13:09', 94.00, 0.00, '2026-06-01', NULL),
+(19, 1005, 'OUT', 1, '2026-05-06 14:15:35', 0.00, 8.00, NULL, NULL),
+(20, 1001, 'OUT', 2, '2026-05-06 14:32:46', 0.00, 16.00, NULL, NULL),
+(21, 1000, 'IN', 1, '2026-05-06 14:33:18', 8.00, 0.00, '2026-05-31', NULL),
+(22, 1000, 'IN', 1, '2026-05-06 16:56:52', 8.00, 0.00, NULL, NULL),
+(23, 1000, 'OUT', 1, '2026-05-06 16:56:56', 0.00, 10.00, NULL, NULL),
+(24, 1000, 'IN', 1, '2026-05-06 16:57:13', 8.00, 0.00, NULL, NULL),
+(25, 1000, 'IN', 1, '2026-05-07 21:27:57', 8.00, 0.00, NULL, NULL),
+(26, 1000, 'IN', 1, '2026-05-08 09:34:42', 8.00, 0.00, NULL, NULL),
+(27, 1000, 'OUT', 1, '2026-05-08 09:58:36', 0.00, 10.00, NULL, NULL),
+(28, 1000, 'IN', 2, '2026-05-08 10:31:40', 16.00, 0.00, NULL, NULL),
+(29, 1000, 'OUT', 2, '2026-05-08 10:32:08', 0.00, 20.00, NULL, NULL),
+(30, 1000, 'OUT', 2, '2026-05-08 10:59:57', 0.00, 20.00, NULL, NULL),
+(31, 1000, 'OUT', 1, '2026-05-08 11:02:33', 0.00, 10.00, NULL, NULL),
+(32, 1000, 'IN', 3, '2026-05-08 11:05:04', 24.00, 0.00, NULL, NULL),
+(33, 1000, 'OUT', 1, '2026-05-08 11:06:15', 0.00, 10.00, NULL, NULL),
+(34, 1000, 'OUT', 1, '2026-05-08 11:16:46', 0.00, 10.00, NULL, NULL),
+(35, 1000, 'OUT', 1, '2026-05-08 11:22:53', 0.00, 10.00, NULL, NULL),
+(36, 1000, 'IN', 3, '2026-05-08 11:26:52', 24.00, 0.00, NULL, NULL),
+(37, 1006, 'OUT', 2, '2026-05-08 11:27:15', 0.00, 20.00, NULL, NULL),
+(38, 1002, 'OUT', 2, '2026-05-08 11:28:54', 0.00, 16.00, NULL, NULL),
+(39, 1005, 'IN', 1, '2026-05-08 15:32:40', 0.00, 0.00, '2026-06-01', NULL),
+(40, 1005, 'IN', 1, '2026-05-08 15:33:09', 0.00, 0.00, '2028-01-01', NULL),
+(41, 1008, 'IN', 21, '2026-05-08 15:33:39', 137.00, 0.00, '2030-01-01', NULL),
+(42, 1000, 'IN', 1, '2026-05-08 15:39:07', 8.00, 0.00, '2026-06-08', NULL),
+(43, 1000, 'IN', 1, '2026-05-08 15:42:58', 8.00, 0.00, '2026-09-01', NULL),
+(44, 1000, 'OUT', 1, '2026-05-08 15:43:44', 0.00, 10.00, NULL, NULL),
+(45, 1000, 'IN', 1, '2026-05-08 15:47:59', 8.00, 0.00, '2026-05-09', NULL),
+(46, 1000, 'OUT', 1, '2026-05-08 17:09:54', 0.00, 10.00, NULL, NULL),
+(47, 1007, 'IN', 5, '2026-05-08 17:12:50', 0.00, 0.00, '2030-01-08', NULL),
+(48, 1007, 'OUT', 1, '2026-05-08 17:13:27', 0.00, 8.00, NULL, NULL),
+(49, 1000, 'OUT', 10, '2026-05-08 17:17:21', 0.00, 100.00, NULL, NULL),
+(50, 1001, 'OUT', 5, '2026-05-08 17:22:52', 0.00, 40.00, NULL, NULL),
+(51, 1000, 'IN', 3, '2026-05-08 17:26:24', 24.00, 0.00, '2027-08-19', NULL),
+(52, 1001, 'IN', 5, '2026-05-08 17:26:39', 30.00, 0.00, '2032-01-01', NULL),
+(53, 1002, 'IN', 1, '2026-05-08 17:27:46', 6.00, 0.00, '2026-05-09', NULL),
+(54, 1000, 'IN', 1, '2026-05-08 17:33:37', 8.00, 0.00, '2026-06-01', NULL),
+(55, 1000, 'IN', 31, '2026-05-08 17:48:16', 248.00, 0.00, NULL, NULL),
+(56, 1000, 'IN', 1, '2026-05-08 17:50:24', 8.00, 0.00, '2026-05-29', 57),
+(57, 1000, 'ADJUSTMENT', -1, '2026-05-09 15:18:36', -8.00, 0.00, NULL, 56),
+(58, 1007, 'OUT', 1, '2026-05-11 00:38:39', 0.00, 8.00, NULL, NULL),
+(59, 1007, 'OUT', 1, '2026-05-11 00:39:07', 0.00, 9.00, NULL, 60),
+(60, 1007, 'ADJUSTMENT', -1, '2026-05-11 16:31:23', 0.00, -9.00, NULL, 59),
+(61, 1054, 'IN', 100, '2026-05-11 16:34:11', 1375.00, 0.00, NULL, 62),
+(62, 1054, 'ADJUSTMENT', -100, '2026-05-11 16:37:13', -1375.00, -1700.00, NULL, 61),
+(63, 1000, 'OUT', 1, '2026-05-11 16:50:46', 0.00, 10.00, NULL, 64),
+(64, 1000, 'ADJUSTMENT', -1, '2026-05-11 16:51:22', 0.00, -10.00, NULL, 63);
 
 --
 -- Triggers `stock_transaction`
 --
 DELIMITER $$
 CREATE TRIGGER `trg_calculate_buy_amount` BEFORE INSERT ON `stock_transaction` FOR EACH ROW BEGIN
-    -- Only calculate if transaction_type is NOT "IN"
-    IF NEW.transaction_type != 'OUT' THEN
+    -- This trigger is for RESTOCKS (IN)
+    -- It ensures the business logs how much they PAID the supplier
+    IF NEW.transaction_type = 'IN' THEN
         SET NEW.buy_amount = NEW.quantity * (
             SELECT cost 
             FROM product
             WHERE product_id = NEW.product_id
         );
+        -- We explicitly ensure sell_amount stays 0 or NULL during a restock
+        SET NEW.sell_amount = 0; 
     END IF;
 END
 $$
@@ -404,7 +413,7 @@ DELIMITER ;
 DELIMITER $$
 CREATE TRIGGER `trg_calculate_sell_amount` BEFORE INSERT ON `stock_transaction` FOR EACH ROW BEGIN
     -- Only calculate if transaction_type is NOT "IN"
-    IF NEW.transaction_type != 'IN' THEN
+    IF NEW.transaction_type = 'OUT' THEN
         SET NEW.sell_amount = NEW.quantity * (
             SELECT price 
             FROM product
@@ -489,7 +498,7 @@ ALTER TABLE `category`
 -- AUTO_INCREMENT for table `notification`
 --
 ALTER TABLE `notification`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=110;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=175;
 
 --
 -- AUTO_INCREMENT for table `product`
@@ -501,7 +510,7 @@ ALTER TABLE `product`
 -- AUTO_INCREMENT for table `stock_transaction`
 --
 ALTER TABLE `stock_transaction`
-  MODIFY `transaction_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=60;
+  MODIFY `transaction_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=65;
 
 --
 -- AUTO_INCREMENT for table `user`
