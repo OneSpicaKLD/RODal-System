@@ -45,10 +45,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Change Password - Rodal Store</title>
+
+    <link rel="icon" type="image/png" href="rodal-icon.png">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="style.css">
@@ -71,7 +75,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             background: white;
             padding: 40px;
             border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             border: 2px solid var(--primary-yellow);
             width: 400px;
         }
@@ -165,7 +169,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         .btn-change:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(241,196,15,0.4);
+            box-shadow: 0 4px 12px rgba(241, 196, 15, 0.4);
         }
 
         .btn-back {
@@ -177,7 +181,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             text-decoration: none;
         }
 
-        .btn-back:hover { color: #333; }
+        .btn-back:hover {
+            color: #333;
+        }
 
         .alert {
             padding: 10px 14px;
@@ -208,89 +214,91 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     </style>
 </head>
+
 <body>
-<div class="change-pw-wrapper">
-    <div class="change-pw-card">
+    <div class="change-pw-wrapper">
+        <div class="change-pw-card">
 
-        <div class="card-header">
-            <div class="card-icon"><i class="fas fa-key"></i></div>
-            <div>
-                <h2>Change Password</h2>
-                <p>Update your owner account password</p>
+            <div class="card-header">
+                <div class="card-icon"><i class="fas fa-key"></i></div>
+                <div>
+                    <h2>Change Password</h2>
+                    <p>Update your owner account password</p>
+                </div>
             </div>
+
+            <?php if (!empty($error)): ?>
+                <div class="alert alert-error">
+                    <i class="fas fa-exclamation-circle"></i> <?php echo htmlspecialchars($error); ?>
+                </div>
+            <?php endif; ?>
+
+            <?php if (!empty($success)): ?>
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle"></i> <?php echo htmlspecialchars($success); ?>
+                </div>
+            <?php endif; ?>
+
+            <form method="POST" action="">
+
+                <div class="input-group">
+                    <label>Current Password</label>
+                    <div class="password-wrap">
+                        <input type="password" name="current_password" id="cur_pw" placeholder="Enter current password" required>
+                        <i class="fas fa-eye toggle-pw" onclick="toggleVisibility('cur_pw', this)"></i>
+                    </div>
+                </div>
+
+                <hr class="divider">
+
+                <div class="input-group">
+                    <label>New Password</label>
+                    <div class="password-wrap">
+                        <input type="password" name="new_password" id="new_pw" placeholder="Enter new password" required>
+                        <i class="fas fa-eye toggle-pw" onclick="toggleVisibility('new_pw', this)"></i>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Confirm New Password</label>
+                    <div class="password-wrap">
+                        <input type="password" name="confirm_password" id="con_pw" placeholder="Re-enter new password" required>
+                        <i class="fas fa-eye toggle-pw" onclick="toggleVisibility('con_pw', this)"></i>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-change">
+                    <i class="fas fa-save"></i> Save New Password
+                </button>
+            </form>
+
+            <a href="dashboard.php" class="btn-back">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
         </div>
+    </div>
 
-        <?php if (!empty($error)): ?>
-            <div class="alert alert-error">
-                <i class="fas fa-exclamation-circle"></i> <?php echo htmlspecialchars($error); ?>
-            </div>
-        <?php endif; ?>
+    <script>
+        function toggleVisibility(inputId, icon) {
+            const input = document.getElementById(inputId);
+            const isHidden = input.type === 'password';
+            input.type = isHidden ? 'text' : 'password';
+            icon.classList.toggle('fa-eye');
+            icon.classList.toggle('fa-eye-slash');
+        }
 
         <?php if (!empty($success)): ?>
-            <div class="alert alert-success">
-                <i class="fas fa-check-circle"></i> <?php echo htmlspecialchars($success); ?>
-            </div>
+            Swal.fire({
+                icon: 'success',
+                title: 'Password Changed!',
+                text: 'Your password has been updated successfully.',
+                confirmButtonColor: '#f1c40f',
+                confirmButtonText: 'OK'
+            }).then(() => {
+                window.location.href = 'dashboard.php';
+            });
         <?php endif; ?>
-
-        <form method="POST" action="">
-
-            <div class="input-group">
-                <label>Current Password</label>
-                <div class="password-wrap">
-                    <input type="password" name="current_password" id="cur_pw" placeholder="Enter current password" required>
-                    <i class="fas fa-eye toggle-pw" onclick="toggleVisibility('cur_pw', this)"></i>
-                </div>
-            </div>
-
-            <hr class="divider">
-
-            <div class="input-group">
-                <label>New Password</label>
-                <div class="password-wrap">
-                    <input type="password" name="new_password" id="new_pw" placeholder="Enter new password" required>
-                    <i class="fas fa-eye toggle-pw" onclick="toggleVisibility('new_pw', this)"></i>
-                </div>
-            </div>
-
-            <div class="input-group">
-                <label>Confirm New Password</label>
-                <div class="password-wrap">
-                    <input type="password" name="confirm_password" id="con_pw" placeholder="Re-enter new password" required>
-                    <i class="fas fa-eye toggle-pw" onclick="toggleVisibility('con_pw', this)"></i>
-                </div>
-            </div>
-
-            <button type="submit" class="btn-change">
-                <i class="fas fa-save"></i> Save New Password
-            </button>
-        </form>
-
-        <a href="dashboard.php" class="btn-back">
-            <i class="fas fa-arrow-left"></i> Back to Dashboard
-        </a>
-    </div>
-</div>
-
-<script>
-    function toggleVisibility(inputId, icon) {
-        const input = document.getElementById(inputId);
-        const isHidden = input.type === 'password';
-        input.type = isHidden ? 'text' : 'password';
-        icon.classList.toggle('fa-eye');
-        icon.classList.toggle('fa-eye-slash');
-    }
-
-    <?php if (!empty($success)): ?>
-    Swal.fire({
-        icon: 'success',
-        title: 'Password Changed!',
-        text: 'Your password has been updated successfully.',
-        confirmButtonColor: '#f1c40f',
-        confirmButtonText: 'OK'
-    }).then(() => {
-        window.location.href = 'dashboard.php';
-    });
-    <?php endif; ?>
-</script>
+    </script>
 </body>
+
 </html>

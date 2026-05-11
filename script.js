@@ -80,47 +80,73 @@ function updateChart(timeframe) {
 
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Select all elements
     const notifBtn = document.getElementById('notifBtn');
     const notifDropdown = document.getElementById('notifDropdown');
-    const badge = document.querySelector('.notif-badge');
-
-    notifBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        notifDropdown.classList.toggle('active');
-
-        document.getElementById('profileDropdown')?.classList.remove('show');
-    });
-
-    document.addEventListener('click', (e) => {
-        if (!notifBtn.contains(e.target) && !notifDropdown.contains(e.target)) {
-            console.log("Hello world");
-            notifDropdown.classList.remove('active');
-        }
-    });
-
-    document.getElementById('markRead').addEventListener('click', () => {
-        const unreadItems = document.querySelectorAll('.notif-list li.unread');
-        unreadItems.forEach(item => item.classList.remove('unread'));
-        if (badge) badge.style.display = 'none';
-    });
-
-    // 1. Get the Profile elements
     const profileBtn = document.getElementById('profileBtn');
     const profileDropdown = document.getElementById('profileDropdown');
+    const badge = document.querySelector('.notif-badge');
+    const markRead = document.getElementById('markRead');
 
-    // 2. Add the click listener (This is the missing piece!)
-    if (profileBtn && profileDropdown) {
-        profileBtn.addEventListener('click', (e) => {
-            e.stopPropagation(); // Stop it from closing immediately
-            profileDropdown.classList.toggle('active'); // This matches your CSS .active { display: block }
+    // Function to close all dropdowns
+    const closeAllDropdowns = () => {
+        if (notifDropdown) notifDropdown.classList.remove('active');
+        if (profileDropdown) {
+            profileDropdown.style.display = 'none';
+            profileDropdown.classList.remove('active');
+        }
+    };
 
-            // Close the notification dropdown if it happens to be open
-            const notifDropdown = document.getElementById('notifDropdown');
-            if (notifDropdown) notifDropdown.classList.remove('active');
+    // Notification Bell Toggle
+    if (notifBtn && notifDropdown) {
+        notifBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = notifDropdown.classList.contains('active');
+
+            closeAllDropdowns(); // Close everything first
+
+            if (!isOpen) {
+                notifDropdown.classList.add('active');
+            }
         });
     }
 
+    // Profile Button Toggle
+    if (profileBtn && profileDropdown) {
+        profileBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isHidden = profileDropdown.style.display === 'none';
+
+            closeAllDropdowns(); // Close everything first
+
+            if (isHidden) {
+                profileDropdown.style.display = 'block';
+                profileDropdown.classList.add('active');
+            }
+        });
+    }
+
+    // Click outside to close
+    document.addEventListener('click', (e) => {
+        // If the click is not inside a button or a dropdown, close everything
+        const isClickInsideNotif = notifBtn?.contains(e.target) || notifDropdown?.contains(e.target);
+        const isClickInsideProfile = profileBtn?.contains(e.target) || profileDropdown?.contains(e.target);
+
+        if (!isClickInsideNotif && !isClickInsideProfile) {
+            closeAllDropdowns();
+        }
+    });
+
+    // Mark as Read Logic
+    if (markRead) {
+        markRead.addEventListener('click', () => {
+            const unreadItems = document.querySelectorAll('.notif-list li.unread');
+            unreadItems.forEach(item => item.classList.remove('unread'));
+            if (badge) badge.style.display = 'none';
+        });
+    }
 });
+
 
 function refreshNotifications() {
     fetch('check_alerts.php')

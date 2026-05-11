@@ -92,6 +92,10 @@ $result = mysqli_query($conn, $sql);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rodal Store - Purchase History</title>
+
+
+    <link rel="icon" type="image/png" href="rodal-icon.png">
+
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -360,7 +364,7 @@ $result = mysqli_query($conn, $sql);
                         <?php
                         // We REMOVED the redundant SQL here because it's already handled at the TOP of the file.
                         // This ensures $result uses the sorting and historical columns from the main query.
-                        
+
                         if ($result && $result->num_rows > 0) {
                             while ($row = $result->fetch_assoc()) {
                                 $transaction_id = $row['transaction_id'];
@@ -404,7 +408,7 @@ $result = mysqli_query($conn, $sql);
                                     $typeLabel = $isRestock ? 'Restock' : 'Sale';
                                     $typeColor = $isRestock ? '#3498db' : '#2e7d32';
                                 }
-                                ?>
+                        ?>
 
                                 <tr>
                                     <!-- Date & Time -->
@@ -455,7 +459,7 @@ $result = mysqli_query($conn, $sql);
                                         ₱<?php echo number_format($subtotal, 2); ?>
                                     </td>
                                 </tr>
-                                <?php
+                        <?php
                             }
                         } else {
                             echo "<tr><td colspan='8' style='text-align:center;'>No transactions found.</td></tr>";
@@ -469,7 +473,7 @@ $result = mysqli_query($conn, $sql);
 
             <script>
                 document.querySelectorAll(".delete-btn").forEach(button => {
-                    button.addEventListener("click", function () {
+                    button.addEventListener("click", function() {
                         const transactionId = this.getAttribute('data-id'); // Kunin ang ID mula sa button
                         const row = this.closest("tr"); // Kunin ang table row para matanggal mamaya
 

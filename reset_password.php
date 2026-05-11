@@ -60,10 +60,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reset Password - Rodal Store</title>
+
+    <link rel="icon" type="image/png" href="rodal-icon.png">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="style.css">
@@ -86,7 +90,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             background: white;
             padding: 40px;
             border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             border: 2px solid var(--primary-yellow);
             width: 420px;
         }
@@ -202,7 +206,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         .btn-reset:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(241,196,15,0.4);
+            box-shadow: 0 4px 12px rgba(241, 196, 15, 0.4);
         }
 
         .btn-back {
@@ -214,7 +218,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             text-decoration: none;
         }
 
-        .btn-back:hover { color: #333; }
+        .btn-back:hover {
+            color: #333;
+        }
 
         .alert {
             padding: 10px 14px;
@@ -260,114 +266,116 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     </style>
 </head>
+
 <body>
-<div class="reset-pw-wrapper">
-    <div class="reset-pw-card">
+    <div class="reset-pw-wrapper">
+        <div class="reset-pw-card">
 
-        <div class="card-header">
-            <div class="card-icon"><i class="fas fa-shield-alt"></i></div>
-            <div>
-                <h2>Reset Password</h2>
-                <p>Admin control — reset any account's password</p>
+            <div class="card-header">
+                <div class="card-icon"><i class="fas fa-shield-alt"></i></div>
+                <div>
+                    <h2>Reset Password</h2>
+                    <p>Admin control — reset any account's password</p>
+                </div>
             </div>
+
+            <?php if (!empty($error)): ?>
+                <div class="alert alert-error">
+                    <i class="fas fa-exclamation-circle"></i> <?php echo htmlspecialchars($error); ?>
+                </div>
+            <?php endif; ?>
+
+            <?php if (!empty($success)): ?>
+                <div class="alert alert-success">
+                    <i class="fas fa-check-circle"></i> <?php echo $success; ?>
+                </div>
+            <?php endif; ?>
+
+            <form method="POST" action="">
+
+                <!-- Step 1: Select account to reset -->
+                <p class="section-label">Step 1 — Select Account to Reset</p>
+
+                <div class="input-group">
+                    <label>Choose Account</label>
+                    <select name="target_user_id" required>
+                        <option value="">— Select a user —</option>
+                        <?php foreach ($all_users as $u): ?>
+                            <option value="<?php echo $u['user_id']; ?>"
+                                <?php echo (isset($_POST['target_user_id']) && $_POST['target_user_id'] == $u['user_id']) ? 'selected' : ''; ?>>
+                                <?php echo htmlspecialchars($u['username']); ?>
+                                (<?php echo ucfirst($u['role']); ?>)
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+
+                <hr class="divider">
+
+                <!-- Step 2: Set new password -->
+                <p class="section-label">Step 2 — Set New Password</p>
+
+                <div class="input-group">
+                    <label>New Password</label>
+                    <div class="password-wrap">
+                        <input type="password" name="new_password" id="new_pw" placeholder="Enter new password" required>
+                        <i class="fas fa-eye toggle-pw" onclick="toggleVisibility('new_pw', this)"></i>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Confirm New Password</label>
+                    <div class="password-wrap">
+                        <input type="password" name="confirm_password" id="con_pw" placeholder="Re-enter new password" required>
+                        <i class="fas fa-eye toggle-pw" onclick="toggleVisibility('con_pw', this)"></i>
+                    </div>
+                </div>
+
+                <hr class="divider">
+
+                <!-- Step 3: Verify admin identity -->
+                <p class="section-label">Step 3 — Confirm Your Admin Password</p>
+
+                <div class="input-group">
+                    <label>Your Password <span style="color:#888;font-weight:400;">(to authorize this action)</span></label>
+                    <div class="password-wrap">
+                        <input type="password" name="admin_password" id="adm_pw" placeholder="Enter your admin password" required>
+                        <i class="fas fa-eye toggle-pw" onclick="toggleVisibility('adm_pw', this)"></i>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-reset">
+                    <i class="fas fa-sync-alt"></i> Reset Password
+                </button>
+            </form>
+
+            <a href="admin_dashboard.php" class="btn-back">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
         </div>
+    </div>
 
-        <?php if (!empty($error)): ?>
-            <div class="alert alert-error">
-                <i class="fas fa-exclamation-circle"></i> <?php echo htmlspecialchars($error); ?>
-            </div>
-        <?php endif; ?>
+    <script>
+        function toggleVisibility(inputId, icon) {
+            const input = document.getElementById(inputId);
+            const isHidden = input.type === 'password';
+            input.type = isHidden ? 'text' : 'password';
+            icon.classList.toggle('fa-eye');
+            icon.classList.toggle('fa-eye-slash');
+        }
 
         <?php if (!empty($success)): ?>
-            <div class="alert alert-success">
-                <i class="fas fa-check-circle"></i> <?php echo $success; ?>
-            </div>
+            Swal.fire({
+                icon: 'success',
+                title: 'Password Reset!',
+                html: '<?php echo addslashes($success); ?>',
+                confirmButtonColor: '#f1c40f',
+                confirmButtonText: 'OK'
+            }).then(() => {
+                window.location.href = 'admin_dashboard.php';
+            });
         <?php endif; ?>
-
-        <form method="POST" action="">
-
-            <!-- Step 1: Select account to reset -->
-            <p class="section-label">Step 1 — Select Account to Reset</p>
-
-            <div class="input-group">
-                <label>Choose Account</label>
-                <select name="target_user_id" required>
-                    <option value="">— Select a user —</option>
-                    <?php foreach ($all_users as $u): ?>
-                        <option value="<?php echo $u['user_id']; ?>"
-                            <?php echo (isset($_POST['target_user_id']) && $_POST['target_user_id'] == $u['user_id']) ? 'selected' : ''; ?>>
-                            <?php echo htmlspecialchars($u['username']); ?> 
-                            (<?php echo ucfirst($u['role']); ?>)
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-
-            <hr class="divider">
-
-            <!-- Step 2: Set new password -->
-            <p class="section-label">Step 2 — Set New Password</p>
-
-            <div class="input-group">
-                <label>New Password</label>
-                <div class="password-wrap">
-                    <input type="password" name="new_password" id="new_pw" placeholder="Enter new password" required>
-                    <i class="fas fa-eye toggle-pw" onclick="toggleVisibility('new_pw', this)"></i>
-                </div>
-            </div>
-
-            <div class="input-group">
-                <label>Confirm New Password</label>
-                <div class="password-wrap">
-                    <input type="password" name="confirm_password" id="con_pw" placeholder="Re-enter new password" required>
-                    <i class="fas fa-eye toggle-pw" onclick="toggleVisibility('con_pw', this)"></i>
-                </div>
-            </div>
-
-            <hr class="divider">
-
-            <!-- Step 3: Verify admin identity -->
-            <p class="section-label">Step 3 — Confirm Your Admin Password</p>
-
-            <div class="input-group">
-                <label>Your Password <span style="color:#888;font-weight:400;">(to authorize this action)</span></label>
-                <div class="password-wrap">
-                    <input type="password" name="admin_password" id="adm_pw" placeholder="Enter your admin password" required>
-                    <i class="fas fa-eye toggle-pw" onclick="toggleVisibility('adm_pw', this)"></i>
-                </div>
-            </div>
-
-            <button type="submit" class="btn-reset">
-                <i class="fas fa-sync-alt"></i> Reset Password
-            </button>
-        </form>
-
-        <a href="admin_dashboard.php" class="btn-back">
-            <i class="fas fa-arrow-left"></i> Back to Dashboard
-        </a>
-    </div>
-</div>
-
-<script>
-    function toggleVisibility(inputId, icon) {
-        const input = document.getElementById(inputId);
-        const isHidden = input.type === 'password';
-        input.type = isHidden ? 'text' : 'password';
-        icon.classList.toggle('fa-eye');
-        icon.classList.toggle('fa-eye-slash');
-    }
-
-    <?php if (!empty($success)): ?>
-    Swal.fire({
-        icon: 'success',
-        title: 'Password Reset!',
-        html: '<?php echo addslashes($success); ?>',
-        confirmButtonColor: '#f1c40f',
-        confirmButtonText: 'OK'
-    }).then(() => {
-        window.location.href = 'admin_dashboard.php';
-    });
-    <?php endif; ?>
-</script>
+    </script>
 </body>
+
 </html>

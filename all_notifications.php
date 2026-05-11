@@ -43,6 +43,9 @@ $result = mysqli_query($conn, $notif_sql);
 <head>
     <meta charset="UTF-8">
     <title>All Alerts - Rodal Store</title>
+
+    <link rel="icon" type="image/png" href="rodal-icon.png">
+
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cloudflare.com">
     <script src="script.js"></script>
