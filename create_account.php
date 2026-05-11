@@ -1,52 +1,36 @@
 <?php
 require 'db_connect.php';
-//one owner one admin
-$check_users = mysqli_query($conn, "SELECT COUNT(*) as total FROM user");
-$user_data = mysqli_fetch_assoc($check_users);
-$total_users = $user_data['total'];
-session_start();
 
-if (isset($_SESSION['isLoggedIn'])) {
-    header("Location: dashboard.php");
+
+$check_total = mysqli_query($conn, "SELECT COUNT(*) as total FROM user");
+$total_data = mysqli_fetch_assoc($check_total);
+
+
+if ($total_data['total'] >= 2) {
+    header("Location: index.php");
     exit();
 }
 
 $error = "";
-
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $_POST['username'];
-    $password = $_POST['password'];
+    $email = $_POST['email'];
+    $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+    $role = $_POST['role'];
 
-    $stmt = $conn->prepare("SELECT * FROM user WHERE username = ?");
-    $stmt->bind_param("s", $username); // Ang "s" ay nangangahulugang "string"
-    $stmt->execute();
-    $result = $stmt->get_result();
 
-    if (!$result) {
-        die("SQL Error: " . mysqli_error($conn));
-    }
+    $check_role = $conn->prepare("SELECT * FROM user WHERE role = ?");
+    $check_role->bind_param("s", $role);
+    $check_role->execute();
 
-    if (mysqli_num_rows($result) > 0) {
-
-        $user = mysqli_fetch_assoc($result);
-
-        if (password_verify($password, $user['password'])) {
-
-            $_SESSION['isLoggedIn'] = true;
-            $_SESSION['username'] = $user['username'];
-            $_SESSION['role'] = $user['role'];
-
-            if ($user['role'] == 'admin') {
-                header("Location: admin_dashboard.php");
-            } else {
-                header("Location: dashboard.php");
-            }
-            exit();
-        } else {
-            $error = "Incorrect password.";
-        }
+    if ($check_role->get_result()->num_rows > 0) {
+        $error = "The role <strong>$role</strong> is already taken.";
     } else {
-        $error = "Account not found.";
+        $stmt = $conn->prepare("INSERT INTO user (username, email, password, role) VALUES (?, ?, ?, ?)");
+        $stmt->bind_param("ssss", $username, $email, $password, $role);
+        if ($stmt->execute()) {
+            echo "<script>alert('Account created!'); window.location='index.php';</script>";
+        }
     }
 }
 ?>
@@ -56,9 +40,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - System</title>
+    <title>Create Account - System</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
     <style>
         :root {
             --bg-yellow: #fffdf0;
@@ -118,13 +101,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             font-size: 14px;
         }
 
-        input {
+        input,
+        select {
             width: 100%;
             padding: 12px;
             border: 1px solid #ddd;
             border-radius: 10px;
             outline: none;
             box-sizing: border-box;
+            font-family: inherit;
+        }
+
+        select {
+            background: white;
+            cursor: pointer;
         }
 
         .login-btn {
@@ -143,18 +133,36 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             transform: translateY(-2px);
         }
 
-        .password-container {
+        .error-msg {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            border: 1px solid #f5c6cb;
+            text-align: center;
+        }
+
+        .footer-links {
+            margin-top: 25px;
+            font-size: 13px;
+        }
+
+        .footer-links a {
+            color: #888;
+            text-decoration: none;
+        }
+
+        /* Add this to your existing <style> */
+        .password-wrapper {
             position: relative;
             width: 100%;
         }
 
-        .password-container input {
-            width: 100%;
-            padding: 12px 45px 12px 12px;
-            box-sizing: border-box;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            outline: none;
+        .password-wrapper input {
+            padding-right: 45px;
+            /* Space for the icon so text doesn't overlap */
         }
 
         .toggle-password {
@@ -165,6 +173,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             cursor: pointer;
             color: #777;
             font-size: 16px;
+            z-index: 10;
         }
     </style>
 </head>
@@ -173,7 +182,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     <div class="login-card">
         <div class="logo-r">R</div>
-        <h2>Sign In</h2>
+        <h2>Create Account</h2>
+
 
         <form method="POST" action="">
             <?php if (!empty($error)): ?>
@@ -184,29 +194,41 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             <div class="input-group">
                 <label>Username</label>
-                <input type="text" name="username" placeholder="Enter your username" required>
+                <input type="text" name="username" placeholder="Create your username" required>
+            </div>
+
+            <div class="input-group">
+                <label>Email</label>
+                <input type="email" name="email" placeholder="email@example.com" required>
             </div>
 
             <div class="input-group">
                 <label>Password</label>
-                <div class="password-container">
-                    <input type="password" name="password" id="password" placeholder="Enter your password" required>
+                <div class="password-wrapper">
+                    <input type="password" name="password" id="password" placeholder="Create a password" required>
                     <i class="fas fa-eye toggle-password" id="togglePassword"></i>
                 </div>
             </div>
 
-            <button type="submit" class="login-btn">LOGIN</button>
 
-            <!-- Dito papasok yung logic para sa Create Account at Forgot Password -->
-            <div style="margin-top: 25px; font-size: 13px;">
-                <?php if ($total_users < 2): ?>
-                    <a href="create_account.php" style="color: #333; text-decoration: none; font-weight: 600;">Create Account</a>
-                    <span style="margin: 0 8px; color: #ccc;">|</span>
-                <?php endif; ?>
-                <a href="forgot_pass.php" style="color: #888; text-decoration: none;">Forgot Password?</a>
+            <div class="input-group">
+                <label>Assign Role</label>
+                <select name="role" required>
+                    <option value="" disabled selected>-- Select Role --</option>
+                    <option value="owner">Owner</option>
+                    <option value="admin">System Admin</option>
+                </select>
             </div>
+
+            <button type="submit" class="login-btn">REGISTER</button>
+
         </form>
+
+        <div class="footer-links">
+            <a href="index.php"><i class="fas fa-arrow-left"></i> Back to Login</a>
+        </div>
     </div>
+
 </body>
 <script>
     const togglePassword = document.getElementById("togglePassword");

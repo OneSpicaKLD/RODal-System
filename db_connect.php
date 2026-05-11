@@ -8,5 +8,3 @@ if (!$conn) {
 }
 
 ?>
-
-//gusto ko na unli wings or samgyupsal
