@@ -93,6 +93,9 @@ $result = mysqli_query($conn, $sql);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rodal Store - Purchase History</title>
+
+    <link rel="icon" type="image/png" href="http://localhost:8000/RODALSystem/rodal-icon.png">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="style.css">
@@ -249,7 +252,7 @@ $result = mysqli_query($conn, $sql);
                                         menu.style.display = (menu.style.display === "none" || menu.style.display === "") ? "block" : "none";
                                     }
 
-                                    window.addEventListener('click', function (e) {
+                                    window.addEventListener('click', function(e) {
                                         var menu = document.getElementById("profileDropdown");
                                         var btn = document.getElementById("profileBtn");
                                         if (menu && menu.style.display === "block") {
@@ -259,7 +262,7 @@ $result = mysqli_query($conn, $sql);
                                         }
                                     });
 
-                                    window.addEventListener('keydown', function (e) {
+                                    window.addEventListener('keydown', function(e) {
                                         if (e.key === "Escape") {
                                             document.getElementById("profileDropdown").style.display = "none";
                                         }
@@ -448,7 +451,7 @@ $result = mysqli_query($conn, $sql);
                             //         ORDER BY st.transaction_id DESC
                             //         LIMIT $limit OFFSET $offset";
                             // $result = $conn->query($sql);
-                        
+
                             if ($result && $result->num_rows > 0) {
 
                                 while ($row = $result->fetch_assoc()) {
@@ -492,7 +495,7 @@ $result = mysqli_query($conn, $sql);
                                         $typeLabel = $isRestock ? 'Restock' : 'Sale';
                                         $typeColor = $isRestock ? '#3498db' : '#2e7d32';
                                     }
-                                    ?>
+                        ?>
 
 
                                     <tr>
@@ -545,9 +548,8 @@ $result = mysqli_query($conn, $sql);
                                             <?php endif; ?>
                                         </td>
                                     </tr>
-                                    <?php
+                        <?php
                                 }
-
                             } else {
                                 echo "<tr><td colspan='6' style='text-align:center;'>No transactions found.</td></tr>";
                             }
@@ -563,7 +565,7 @@ $result = mysqli_query($conn, $sql);
 
             <script>
                 document.querySelectorAll(".delete-btn").forEach(button => {
-                    button.addEventListener("click", function () {
+                    button.addEventListener("click", function() {
                         const transactionId = this.getAttribute('data-id'); // Kunin ang ID mula sa button
                         const row = this.closest("tr"); // Kunin ang table row para matanggal mamaya
 
