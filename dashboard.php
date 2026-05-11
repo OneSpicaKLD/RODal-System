@@ -153,7 +153,8 @@ $js_month_revenue = json_encode($monthly_revenue);
                 <li><a href="purchase-history.php"><i class="fas fa-history"></i><span>Transactions
                             History
                         </span></a></li>
-                <li><a href="archived_products.php"><i class="fas fa-archive"></i> <span>Archived Products</span></a></li>
+                <li><a href="archived_products.php"><i class="fas fa-archive"></i> <span>Archived Products</span></a>
+                </li>
             </ul>
         </aside>
 
@@ -189,46 +190,46 @@ $js_month_revenue = json_encode($monthly_revenue);
                         <!-- Notification Ends here... -->
 
                         <!-- DROPDOWN WRAPPER -->
-                        <div class="user-profile-wrapper" style="position: relative !important; display: inline-block !important; vertical-align: middle;">
+                        <div class="user-profile-wrapper"
+                            style="position: relative !important; display: inline-block !important; vertical-align: middle;">
 
-                            <div id="profileBtn" onclick="toggleProfileMenu(event)"
-                                style="cursor: pointer; 
-                padding: 2px; 
-                display: flex; 
-                align-items: center; 
-                justify-content: center; 
-                transition: opacity 0.2s;"
-                                onmouseover="this.style.opacity='0.8'"
+                            <button class="icon-btn" id="profileBtn" style="cursor: pointer; 
+                                padding: 2px; 
+                                display: flex; 
+                                align-items: center; 
+                                justify-content: center; 
+                                transition: opacity 0.2s;" onmouseover="this.style.opacity='0.8'"
                                 onmouseout="this.style.opacity='1'">
-                                <i class="fas fa-user-circle" style="font-size: 24px !important; color: #333 !important;"></i>
-                            </div>
+                                <i class="fas fa-user-circle"
+                                    style="font-size: 24px !important; color: #333 !important;"></i>
+                            </button>
 
-                            <div id="profileDropdown"
-                                style="display: none; 
-                position: absolute !important; 
-                top: 40px !important; 
-                right: 0 !important; 
-                left: auto !important; 
-                width: 200px !important; 
-                background: #ffffff !important; 
-                border-radius: 12px !important; 
-                box-shadow: 0 10px 25px rgba(0,0,0,0.15) !important; 
-                border: 1px solid #edf2f7 !important; 
-                padding: 0 !important; 
-                z-index: 99999 !important;
-                overflow: hidden !important;">
-
-                                <div style="padding: 12px 18px; border-bottom: 1px solid #f0f0f0; background: #fff; text-align: left !important;">
-                                    <strong style="display: block !important; color: #333 !important; font-size: 14px !important; line-height: 1.2 !important; margin: 0 !important;">
+                            <div id="profileDropdown" style="display: none; 
+                                position: absolute !important; 
+                                top: 40px !important; 
+                                right: 0 !important; 
+                                left: auto !important; 
+                                width: 200px !important; 
+                                background: #ffffff !important; 
+                                border-radius: 12px !important; 
+                                box-shadow: 0 10px 25px rgba(0,0,0,0.15) !important; 
+                                border: 1px solid #edf2f7 !important; 
+                                padding: 0 !important; 
+                                z-index: 99999 !important;
+                                overflow: hidden !important;">
+                                <div
+                                    style="padding: 12px 18px; border-bottom: 1px solid #f0f0f0; background: #fff; text-align: left !important;">
+                                    <strong
+                                        style="display: block !important; color: #333 !important; font-size: 14px !important; line-height: 1.2 !important; margin: 0 !important;">
                                         <?php echo htmlspecialchars($_SESSION['username']); ?>
                                     </strong>
-                                    <span style="color: #888 !important; font-size: 12px !important; font-weight: normal !important;">
+                                    <span
+                                        style="color: #888 !important; font-size: 12px !important; font-weight: normal !important;">
                                         <?php echo htmlspecialchars(ucfirst($_SESSION['role'])); ?>
                                     </span>
                                 </div>
 
-                                <a href="change_password.php"
-                                    style="display: flex !important; 
+                                <a href="change_password.php" style="display: flex !important; 
                   align-items: center !important; 
                   gap: 10px !important; 
                   padding: 12px 18px !important; 
@@ -241,15 +242,12 @@ $js_month_revenue = json_encode($monthly_revenue);
                   width: 100% !important;
                   white-space: nowrap !important;
                   border-bottom: 1px solid #f0f0f0 !important;
-                  transition: background 0.2s;"
-                                    onmouseover="this.style.backgroundColor='#fffdf0'"
+                  transition: background 0.2s;" onmouseover="this.style.backgroundColor='#fffdf0'"
                                     onmouseout="this.style.backgroundColor='#ffffff'">
                                     <i class="fas fa-key" style="color: #f1c40f;"></i> Change Password
                                 </a>
 
-                                <a href="logout.php"
-                                    onclick="confirmLogout(event)"
-                                    style="display: flex !important; 
+                                <a href="logout.php" onclick="confirmLogout(event)" style="display: flex !important; 
                   align-items: center !important; 
                   gap: 10px !important; 
                   padding: 12px 18px !important; 
@@ -260,8 +258,7 @@ $js_month_revenue = json_encode($monthly_revenue);
                   justify-content: flex-start !important;
                   width: 100% !important;
                   white-space: nowrap !important;
-                  transition: background 0.2s;"
-                                    onmouseover="this.style.backgroundColor='#fff5f5'"
+                  transition: background 0.2s;" onmouseover="this.style.backgroundColor='#fff5f5'"
                                     onmouseout="this.style.backgroundColor='#ffffff'">
                                     <i class="fas fa-sign-out-alt"></i> Log Out
                                 </a>
@@ -385,7 +382,7 @@ $js_month_revenue = json_encode($monthly_revenue);
                                 $status = "Healthy";
                                 $badge = "good";
                             }
-                        ?>
+                            ?>
 
                             <div class="stock-item-card">
                                 <div class="stock-info">
