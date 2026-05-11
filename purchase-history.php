@@ -94,7 +94,7 @@ $result = mysqli_query($conn, $sql);
     <title>Rodal Store - Purchase History</title>
 
 
-    <link rel="icon" type="image/png" href="http://localhost:8000/RODALSystem/rodal-icon.png">
+    <link rel="icon" type="image/png" href="rodal-icon.png">
 
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
