@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3307
--- Generation Time: May 11, 2026 at 02:20 PM
+-- Generation Time: May 11, 2026 at 03:17 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -29,6 +29,7 @@ USE `rodal`;
 -- Table structure for table `category`
 --
 
+DROP TABLE IF EXISTS `category`;
 CREATE TABLE `category` (
   `category_id` int(11) NOT NULL,
   `category_name` varchar(255) NOT NULL
@@ -55,6 +56,7 @@ INSERT INTO `category` (`category_id`, `category_name`) VALUES
 -- Table structure for table `notification`
 --
 
+DROP TABLE IF EXISTS `notification`;
 CREATE TABLE `notification` (
   `id` int(11) NOT NULL,
   `product_id` int(11) NOT NULL,
@@ -187,6 +189,7 @@ INSERT INTO `notification` (`id`, `product_id`, `transaction_id`, `title`, `mess
 -- Table structure for table `product`
 --
 
+DROP TABLE IF EXISTS `product`;
 CREATE TABLE `product` (
   `product_id` int(11) NOT NULL,
   `product_name` varchar(255) NOT NULL,
@@ -309,6 +312,7 @@ INSERT INTO `product` (`product_id`, `product_name`, `category_id`, `cost`, `pri
 -- Table structure for table `stock_transaction`
 --
 
+DROP TABLE IF EXISTS `stock_transaction`;
 CREATE TABLE `stock_transaction` (
   `transaction_id` int(11) NOT NULL,
   `product_id` int(11) NOT NULL,
@@ -394,6 +398,7 @@ INSERT INTO `stock_transaction` (`transaction_id`, `product_id`, `transaction_ty
 --
 -- Triggers `stock_transaction`
 --
+DROP TRIGGER IF EXISTS `trg_calculate_buy_amount`;
 DELIMITER $$
 CREATE TRIGGER `trg_calculate_buy_amount` BEFORE INSERT ON `stock_transaction` FOR EACH ROW BEGIN
     -- This trigger is for RESTOCKS (IN)
@@ -410,6 +415,7 @@ CREATE TRIGGER `trg_calculate_buy_amount` BEFORE INSERT ON `stock_transaction` F
 END
 $$
 DELIMITER ;
+DROP TRIGGER IF EXISTS `trg_calculate_sell_amount`;
 DELIMITER $$
 CREATE TRIGGER `trg_calculate_sell_amount` BEFORE INSERT ON `stock_transaction` FOR EACH ROW BEGIN
     -- Only calculate if transaction_type is NOT "IN"
@@ -430,20 +436,22 @@ DELIMITER ;
 -- Table structure for table `user`
 --
 
+DROP TABLE IF EXISTS `user`;
 CREATE TABLE `user` (
   `user_id` int(11) NOT NULL,
   `username` varchar(50) NOT NULL,
   `password` varchar(250) NOT NULL,
-  `role` varchar(20) DEFAULT 'admin'
+  `role` varchar(20) DEFAULT 'admin',
+  `email` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `user`
 --
 
-INSERT INTO `user` (`user_id`, `username`, `password`, `role`) VALUES
-(1, 'RODal', '$2y$10$lYPHm8i61lVs6iaVLbVZ..XDqlK8Xd4SRkpLcjtHiEDk0ZULQgmDS', 'owner'),
-(2, 'SysAdmin', '$2y$10$CL.I.q1DBpoxgvzjkEgLpu4l67KodIizGjgDtvJ1JQOaNSZb.eGZq', 'admin');
+INSERT INTO `user` (`user_id`, `username`, `password`, `role`, `email`) VALUES
+(1, 'RODal', '$2y$10$lYPHm8i61lVs6iaVLbVZ..XDqlK8Xd4SRkpLcjtHiEDk0ZULQgmDS', 'owner', ''),
+(2, 'SysAdmin', '$2y$10$CL.I.q1DBpoxgvzjkEgLpu4l67KodIizGjgDtvJ1JQOaNSZb.eGZq', 'admin', '');
 
 --
 -- Indexes for dumped tables
