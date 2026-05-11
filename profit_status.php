@@ -1,4 +1,5 @@
 <?php
+// ... session and db_connect lines ...
 session_start();
 
 if (!isset($_SESSION['isLoggedIn'])) {
@@ -16,30 +17,51 @@ $year_list_res = mysqli_query($conn, $year_list_sql);
 
 
 
-// A. Get the year from the URL, or default to 2026
-$selectedYear = isset($_GET['year']) ? intval($_GET['year']) : 2026;
+// 1. Capture Year and Month from the URL (Syncs with your HTML form)
+$currentY = (int) date('Y');
+$currentM = (int) date('n');
 
-// 1. TODAY (Remains the same, usually doesn't need a year filter)
+$selectedY = isset($_GET['year']) ? intval($_GET['year']) : $currentY;
+$selectedM = isset($_GET['month']) ? intval($_GET['month']) : $currentM;
+
+// 2. TODAY (Stays focused on the actual current date)
 $today_sql = "SELECT SUM(t.sell_amount) as rev, SUM(t.sell_amount - (p.cost * t.quantity)) as prof 
               FROM stock_transaction t JOIN product p ON t.product_id = p.product_id
               WHERE t.transaction_type = 'OUT' AND DATE(t.transaction_date) = CURDATE()";
 $today = mysqli_fetch_assoc(mysqli_query($conn, $today_sql));
 
-// 2. THIS WEEK (Last 7 days)
+// 2. THIS WEEK (Syncs with your selected filters)
 $week_sql = "SELECT SUM(t.sell_amount) as rev, SUM(t.sell_amount - (p.cost * t.quantity)) as prof 
              FROM stock_transaction t JOIN product p ON t.product_id = p.product_id
-             WHERE t.transaction_type = 'OUT' AND t.transaction_date >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)";
-$week = mysqli_fetch_assoc(mysqli_query($conn, $week_sql));
+             WHERE t.transaction_type = 'OUT' 
+             AND YEAR(t.transaction_date) = $selectedY
+             AND MONTH(t.transaction_date) = $selectedM
+             AND t.transaction_date >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)";
 
-// 3. THIS MONTH (Updated to use $selectedYear)
-$month_sql = "SELECT SUM(t.sell_amount) as rev, SUM(t.sell_amount - (p.cost * t.quantity)) as prof 
-              FROM stock_transaction t JOIN product p ON t.product_id = p.product_id
+$week_res = mysqli_query($conn, $week_sql);
+$week = mysqli_fetch_assoc($week_res);
+
+// 3. SELECTED MONTH (Now follows your dropdown selection exactly)
+$month_sql = "SELECT 
+                SUM(t.sell_amount) as rev, 
+                SUM(t.sell_amount - (p.cost * t.quantity)) as prof 
+              FROM stock_transaction t 
+              JOIN product p ON t.product_id = p.product_id
               WHERE t.transaction_type = 'OUT' 
-              AND MONTH(t.transaction_date) = MONTH(CURDATE()) 
-              AND YEAR(t.transaction_date) = $selectedYear"; // Use the variable here!
+              AND MONTH(t.transaction_date) = $selectedM 
+              AND YEAR(t.transaction_date) = $selectedY";
 
-$month = mysqli_fetch_assoc(mysqli_query($conn, $month_sql));
+$month_res = mysqli_query($conn, $month_sql);
+$month = mysqli_fetch_assoc($month_res);
 
+
+// 4. SELECTED YEAR TOTAL (Added for your Year dropdown)
+$year_sql = "SELECT SUM(t.sell_amount) as rev, SUM(t.sell_amount - (p.cost * t.quantity)) as prof 
+             FROM stock_transaction t JOIN product p ON t.product_id = p.product_id
+             WHERE t.transaction_type = 'OUT' 
+             AND YEAR(t.transaction_date) = $selectedY";
+
+$year_data = mysqli_fetch_assoc(mysqli_query($conn, $year_sql));
 ?>
 
 
@@ -56,7 +78,7 @@ $month = mysqli_fetch_assoc(mysqli_query($conn, $month_sql));
     <script src="script.js"></script>
 
 
-    <script>
+    <!-- <script>
         document.addEventListener('DOMContentLoaded', function() {
 
             const allDropdowns = document.querySelectorAll('.modern-dropdown');
@@ -159,7 +181,7 @@ $month = mysqli_fetch_assoc(mysqli_query($conn, $month_sql));
                 allDropdowns.forEach(d => d.classList.remove('is-open'));
             });
         });
-    </script>
+    </script> -->
 
 </head>
 
@@ -182,7 +204,8 @@ $month = mysqli_fetch_assoc(mysqli_query($conn, $month_sql));
                             Status</span></a></li>
                 <li><a href="purchase-history.php"><i class="fas fa-history"></i><span>Transactions
                             History</span></a></li>
-                <li><a href="archived_products.php"><i class="fas fa-archive"></i> <span>Archived Products</span></a></li>
+                <li><a href="archived_products.php"><i class="fas fa-archive"></i> <span>Archived Products</span></a>
+                </li>
             </ul>
         </aside>
 
@@ -217,22 +240,20 @@ $month = mysqli_fetch_assoc(mysqli_query($conn, $month_sql));
                         <!-- Notification Ends here... -->
 
                         <!-- DROPDOWN WRAPPER -->
-                        <div class="user-profile-wrapper" style="position: relative !important; display: inline-block !important; vertical-align: middle;">
+                        <div class="user-profile-wrapper"
+                            style="position: relative !important; display: inline-block !important; vertical-align: middle;">
 
-                            <div id="profileBtn" onclick="toggleProfileMenu(event)"
-                                style="cursor: pointer; 
+                            <div id="profileBtn" onclick="toggleProfileMenu(event)" style="cursor: pointer; 
                 padding: 2px; 
                 display: flex; 
                 align-items: center; 
                 justify-content: center; 
-                transition: opacity 0.2s;"
-                                onmouseover="this.style.opacity='0.8'"
-                                onmouseout="this.style.opacity='1'">
-                                <i class="fas fa-user-circle" style="font-size: 24px !important; color: #333 !important;"></i>
+                transition: opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+                                <i class="fas fa-user-circle"
+                                    style="font-size: 24px !important; color: #333 !important;"></i>
                             </div>
 
-                            <div id="profileDropdown"
-                                style="display: none; 
+                            <div id="profileDropdown" style="display: none; 
                 position: absolute !important; 
                 top: 40px !important; 
                 right: 0 !important; 
@@ -246,17 +267,19 @@ $month = mysqli_fetch_assoc(mysqli_query($conn, $month_sql));
                 z-index: 99999 !important;
                 overflow: hidden !important;">
 
-                                <div style="padding: 12px 18px; border-bottom: 1px solid #f0f0f0; background: #fff; text-align: left !important;">
-                                    <strong style="display: block !important; color: #333 !important; font-size: 14px !important; line-height: 1.2 !important; margin: 0 !important;">
+                                <div
+                                    style="padding: 12px 18px; border-bottom: 1px solid #f0f0f0; background: #fff; text-align: left !important;">
+                                    <strong
+                                        style="display: block !important; color: #333 !important; font-size: 14px !important; line-height: 1.2 !important; margin: 0 !important;">
                                         <?php echo htmlspecialchars($_SESSION['username']); ?>
                                     </strong>
-                                    <span style="color: #888 !important; font-size: 12px !important; font-weight: normal !important;">
+                                    <span
+                                        style="color: #888 !important; font-size: 12px !important; font-weight: normal !important;">
                                         <?php echo htmlspecialchars(ucfirst($_SESSION['role'])); ?>
                                     </span>
                                 </div>
 
-                                <a href="change_password.php"
-                                    style="display: flex !important; 
+                                <a href="change_password.php" style="display: flex !important; 
                                 align-items: center !important; 
                                 gap: 10px !important; 
                                 padding: 12px 18px !important; 
@@ -269,15 +292,12 @@ $month = mysqli_fetch_assoc(mysqli_query($conn, $month_sql));
                                 width: 100% !important;
                                 white-space: nowrap !important;
                                 border-bottom: 1px solid #f0f0f0 !important;
-                                transition: background 0.2s;"
-                                    onmouseover="this.style.backgroundColor='#fffdf0'"
+                                transition: background 0.2s;" onmouseover="this.style.backgroundColor='#fffdf0'"
                                     onmouseout="this.style.backgroundColor='#ffffff'">
                                     <i class="fas fa-key" style="color: #f1c40f;"></i> Change Password
                                 </a>
 
-                                <a href="logout.php"
-                                    onclick="confirmLogout(event)"
-                                    style="display: flex !important; 
+                                <a href="logout.php" onclick="confirmLogout(event)" style="display: flex !important; 
                   align-items: center !important; 
                   gap: 10px !important; 
                   padding: 12px 18px !important; 
@@ -288,8 +308,7 @@ $month = mysqli_fetch_assoc(mysqli_query($conn, $month_sql));
                   justify-content: flex-start !important;
                   width: 100% !important;
                   white-space: nowrap !important;
-                  transition: background 0.2s;"
-                                    onmouseover="this.style.backgroundColor='#fff5f5'"
+                  transition: background 0.2s;" onmouseover="this.style.backgroundColor='#fff5f5'"
                                     onmouseout="this.style.backgroundColor='#ffffff'">
                                     <i class="fas fa-sign-out-alt"></i> Log Out
                                 </a>
@@ -342,7 +361,7 @@ $month = mysqli_fetch_assoc(mysqli_query($conn, $month_sql));
                                         <span>
                                             <?php
                                             $months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-                                            $selectedM = isset($_GET['month']) ? (int)$_GET['month'] : (int)date('n');
+                                            $selectedM = isset($_GET['month']) ? (int) $_GET['month'] : (int) date('n');
                                             echo $months[$selectedM - 1];
                                             ?>
                                         </span>
@@ -351,7 +370,8 @@ $month = mysqli_fetch_assoc(mysqli_query($conn, $month_sql));
                                     <ul class="dropdown-menu">
                                         <?php foreach ($months as $index => $name): ?>
                                             <?php $mVal = $index + 1; ?>
-                                            <li data-value="<?php echo $mVal; ?>" class="<?php echo ($mVal == $selectedM) ? 'active' : ''; ?>">
+                                            <li data-value="<?php echo $mVal; ?>"
+                                                class="<?php echo ($mVal == $selectedM) ? 'active' : ''; ?>">
                                                 <?php echo $name; ?>
                                             </li>
                                         <?php endforeach; ?>

@@ -410,9 +410,6 @@ function filterCategory() {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-    const filterForm = document.getElementById('filterForm');
-    if (!filterForm) return;
-
     const dropdowns = document.querySelectorAll('.modern-dropdown');
 
     dropdowns.forEach(dropdown => {
@@ -421,30 +418,36 @@ document.addEventListener('DOMContentLoaded', function () {
         const hiddenInput = dropdown.querySelector('input[type="hidden"]');
         const displaySpan = dropdown.querySelector('.dropdown-trigger span');
 
+        // TRANSFER THIS: Dynamic form detection
+        const parentForm = dropdown.closest('form');
+
         // 1. Toggle Open/Close
         trigger.addEventListener('click', function (e) {
             e.stopPropagation();
-
             dropdowns.forEach(d => {
                 if (d !== dropdown) d.classList.remove('is-open');
             });
-
             dropdown.classList.toggle('is-open');
         });
 
+        // 2. Selection & Submission
         menuItems.forEach(item => {
             item.addEventListener('click', function () {
                 const val = this.getAttribute('data-value');
                 const text = this.innerText;
 
-                hiddenInput.value = val;
+                if (hiddenInput) hiddenInput.value = val;
                 if (displaySpan) displaySpan.innerText = text;
 
                 menuItems.forEach(li => li.classList.remove('active'));
                 this.classList.add('active');
 
                 dropdown.classList.remove('is-open');
-                filterForm.submit(); 
+
+                // TRANSFER THIS: Auto-submit whichever form the dropdown is in
+                if (parentForm) {
+                    parentForm.submit();
+                }
             });
         });
     });
@@ -659,7 +662,7 @@ window.onclick = function () {
 };
 
 // document.addEventListener('DOMContentLoaded', function () {
-    
+
 //     const allDropdowns = document.querySelectorAll('.modern-dropdown');
 
 //     allDropdowns.forEach(dropdown => {
