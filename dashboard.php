@@ -204,7 +204,7 @@ $js_month_revenue = json_encode($monthly_revenue);
                                     style="font-size: 24px !important; color: #333 !important;"></i>
                             </button>
 
-                            <div id="profileDropdown" style="display: none; 
+                            <div class="notif-dropdown" id="profileDropdown" style="display: none; 
                                 position: absolute !important; 
                                 top: 40px !important; 
                                 right: 0 !important; 

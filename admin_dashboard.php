@@ -144,72 +144,68 @@ $result = mysqli_query($conn, $sql);
                         </div>
 
                         <div class="user-actions">
+                        <!-- NOTIFICATION WRAPPER -->
+                        <div class="notification-container">
+                            <button class="icon-btn" id="notifBtn">
+                                <i class="fas fa-bell"></i>
+                                <span class="notif-badge" id="notifCount">0</span>
+                            </button>
 
-                            <!-- NOTIFICATION WRAPPER -->
-                            <div class="notification-container">
-                                <button class="icon-btn" id="notifBtn">
-                                    <i class="fas fa-bell"></i>
-                                    <span class="notif-badge" id="notifCount">0</span>
-                                </button>
-
-                                <div class="notif-dropdown" id="notifDropdown">
-                                    <div class="notif-header">
-                                        <h3>Notifications</h3>
-                                        <span id="markRead" style="cursor:pointer;">Mark all as read</span>
-                                    </div>
-                                    <!-- This is where the separate file will inject the <li> items -->
-                                    <ul class="notif-list" id="notifList"></ul>
-                                    <div class="notif-footer">
-                                        <a href="all_notifications.php">View all alerts</a>
-                                    </div>
+                            <div class="notif-dropdown" id="notifDropdown">
+                                <div class="notif-header">
+                                    <h3>Notifications</h3>
+                                    <span id="markRead" style="cursor:pointer;">Mark all as read</span>
+                                </div>
+                                <!-- This is where the separate file will inject the <li> items -->
+                                <ul class="notif-list" id="notifList"></ul>
+                                <div class="notif-footer">
+                                    <a href="all_notifications.php">View all alerts</a>
                                 </div>
                             </div>
+                        </div>
+                        <!-- Notification Ends here... -->
 
-                            <!-- Notification Ends here... -->
+                        <!-- DROPDOWN WRAPPER -->
+                        <div class="user-profile-wrapper"
+                            style="position: relative !important; display: inline-block !important; vertical-align: middle;">
 
-                            <div class="user-actions">
+                            <button class="icon-btn" id="profileBtn" style="cursor: pointer; 
+                                padding: 2px; 
+                                display: flex; 
+                                align-items: center; 
+                                justify-content: center; 
+                                transition: opacity 0.2s;" onmouseover="this.style.opacity='0.8'"
+                                onmouseout="this.style.opacity='1'">
+                                <i class="fas fa-user-circle"
+                                    style="font-size: 24px !important; color: #333 !important;"></i>
+                            </button>
 
-                                <!-- DROPDOWN WRAPPER -->
-                                <div class="user-profile-wrapper"
-                                    style="position: relative !important; display: inline-block !important; vertical-align: middle;">
+                            <div class="notif-dropdown" id="profileDropdown" style="display: none; 
+                                position: absolute !important; 
+                                top: 40px !important; 
+                                right: 0 !important; 
+                                left: auto !important; 
+                                width: 200px !important; 
+                                background: #ffffff !important; 
+                                border-radius: 12px !important; 
+                                box-shadow: 0 10px 25px rgba(0,0,0,0.15) !important; 
+                                border: 1px solid #edf2f7 !important; 
+                                padding: 0 !important; 
+                                z-index: 99999 !important;
+                                overflow: hidden !important;">
+                                <div
+                                    style="padding: 12px 18px; border-bottom: 1px solid #f0f0f0; background: #fff; text-align: left !important;">
+                                    <strong
+                                        style="display: block !important; color: #333 !important; font-size: 14px !important; line-height: 1.2 !important; margin: 0 !important;">
+                                        <?php echo htmlspecialchars($_SESSION['username']); ?>
+                                    </strong>
+                                    <span
+                                        style="color: #888 !important; font-size: 12px !important; font-weight: normal !important;">
+                                        <?php echo htmlspecialchars(ucfirst($_SESSION['role'])); ?>
+                                    </span>
+                                </div>
 
-                                    <div id="profileBtn" onclick="toggleProfileMenu(event)" style="cursor: pointer; 
-                padding: 2px; 
-                display: flex; 
-                align-items: center; 
-                justify-content: center; 
-                transition: opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
-                                        <i class="fas fa-user-circle"
-                                            style="font-size: 24px !important; color: #333 !important;"></i>
-                                    </div>
-
-                                    <div id="profileDropdown" style="display: none; 
-                position: absolute !important; 
-                top: 40px !important; 
-                right: 0 !important; 
-                left: auto !important; 
-                width: 200px !important; 
-                background: #ffffff !important; 
-                border-radius: 12px !important; 
-                box-shadow: 0 10px 25px rgba(0,0,0,0.15) !important; 
-                border: 1px solid #edf2f7 !important; 
-                padding: 0 !important; 
-                z-index: 99999 !important;
-                overflow: hidden !important;">
-
-                                        <div
-                                            style="padding: 12px 18px; border-bottom: 1px solid #f0f0f0; background: #fff; text-align: left !important;">
-                                            <strong
-                                                style="display: block !important; color: #333 !important; font-size: 14px !important; line-height: 1.2 !important; margin: 0 !important;">
-                                                <?php echo htmlspecialchars($_SESSION['username']); ?>
-                                            </strong>
-                                            <span
-                                                style="color: #888 !important; font-size: 12px !important; font-weight: normal !important;">
-                                                <?php echo htmlspecialchars(ucfirst($_SESSION['role'])); ?>
-                                            </span>
-                                        </div>
-
-                                        <a href="reset_password.php" style="display: flex !important; 
+                                <a href="change_password.php" style="display: flex !important; 
                   align-items: center !important; 
                   gap: 10px !important; 
                   padding: 12px 18px !important; 
@@ -223,11 +219,11 @@ $result = mysqli_query($conn, $sql);
                   white-space: nowrap !important;
                   border-bottom: 1px solid #f0f0f0 !important;
                   transition: background 0.2s;" onmouseover="this.style.backgroundColor='#fffdf0'"
-                                            onmouseout="this.style.backgroundColor='#ffffff'">
-                                            <i class="fas fa-shield-alt" style="color: #f1c40f;"></i> Reset Password
-                                        </a>
+                                    onmouseout="this.style.backgroundColor='#ffffff'">
+                                    <i class="fas fa-key" style="color: #f1c40f;"></i> Change Password
+                                </a>
 
-                                        <a href="logout.php" onclick="confirmLogout(event)" style="display: flex !important; 
+                                <a href="logout.php" onclick="confirmLogout(event)" style="display: flex !important; 
                   align-items: center !important; 
                   gap: 10px !important; 
                   padding: 12px 18px !important; 
@@ -239,37 +235,13 @@ $result = mysqli_query($conn, $sql);
                   width: 100% !important;
                   white-space: nowrap !important;
                   transition: background 0.2s;" onmouseover="this.style.backgroundColor='#fff5f5'"
-                                            onmouseout="this.style.backgroundColor='#ffffff'">
-                                            <i class="fas fa-sign-out-alt"></i> Log Out
-                                        </a>
-                                    </div>
-                                </div>
-
-                                <script>
-                                    function toggleProfileMenu(event) {
-                                        event.stopPropagation();
-                                        var menu = document.getElementById("profileDropdown");
-                                        menu.style.display = (menu.style.display === "none" || menu.style.display === "") ? "block" : "none";
-                                    }
-
-                                    window.addEventListener('click', function(e) {
-                                        var menu = document.getElementById("profileDropdown");
-                                        var btn = document.getElementById("profileBtn");
-                                        if (menu && menu.style.display === "block") {
-                                            if (!menu.contains(e.target) && !btn.contains(e.target)) {
-                                                menu.style.display = "none";
-                                            }
-                                        }
-                                    });
-
-                                    window.addEventListener('keydown', function(e) {
-                                        if (e.key === "Escape") {
-                                            document.getElementById("profileDropdown").style.display = "none";
-                                        }
-                                    });
-                                </script>
+                                    onmouseout="this.style.backgroundColor='#ffffff'">
+                                    <i class="fas fa-sign-out-alt"></i> Log Out
+                                </a>
                             </div>
                         </div>
+
+                    </div>
             </header>
 
             <div class="top-bar">
@@ -451,7 +423,7 @@ $result = mysqli_query($conn, $sql);
                             //         ORDER BY st.transaction_id DESC
                             //         LIMIT $limit OFFSET $offset";
                             // $result = $conn->query($sql);
-
+                        
                             if ($result && $result->num_rows > 0) {
 
                                 while ($row = $result->fetch_assoc()) {
@@ -495,7 +467,7 @@ $result = mysqli_query($conn, $sql);
                                         $typeLabel = $isRestock ? 'Restock' : 'Sale';
                                         $typeColor = $isRestock ? '#3498db' : '#2e7d32';
                                     }
-                        ?>
+                                    ?>
 
 
                                     <tr>
@@ -548,7 +520,7 @@ $result = mysqli_query($conn, $sql);
                                             <?php endif; ?>
                                         </td>
                                     </tr>
-                        <?php
+                                    <?php
                                 }
                             } else {
                                 echo "<tr><td colspan='6' style='text-align:center;'>No transactions found.</td></tr>";
@@ -565,7 +537,7 @@ $result = mysqli_query($conn, $sql);
 
             <script>
                 document.querySelectorAll(".delete-btn").forEach(button => {
-                    button.addEventListener("click", function() {
+                    button.addEventListener("click", function () {
                         const transactionId = this.getAttribute('data-id'); // Kunin ang ID mula sa button
                         const row = this.closest("tr"); // Kunin ang table row para matanggal mamaya
 

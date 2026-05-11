@@ -10,19 +10,19 @@ require 'db_connect.php';
 
 $search = isset($_GET['search']) ? mysqli_real_escape_string($conn, $_GET['search']) : '';
 
-$limit  = 10;
-$page   = isset($_GET['page']) ? (int) $_GET['page'] : 1;
+$limit = 10;
+$page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
 $offset = ($page - 1) * $limit;
 
-$conditions   = [];
+$conditions = [];
 $conditions[] = "p.is_active = 0";
 $conditions[] = "p.product_name LIKE '%$search%'";
-$whereClause  = "WHERE " . implode(" AND ", $conditions);
+$whereClause = "WHERE " . implode(" AND ", $conditions);
 
-$total_query    = "SELECT COUNT(*) as total FROM product p JOIN category c ON p.category_id = c.category_id $whereClause";
-$total_res      = mysqli_query($conn, $total_query);
-$total_row      = mysqli_fetch_assoc($total_res);
-$total_pages    = ceil($total_row['total'] / $limit);
+$total_query = "SELECT COUNT(*) as total FROM product p JOIN category c ON p.category_id = c.category_id $whereClause";
+$total_res = mysqli_query($conn, $total_query);
+$total_row = mysqli_fetch_assoc($total_res);
+$total_pages = ceil($total_row['total'] / $limit);
 
 $sql = "SELECT p.product_id, p.product_name, p.product_sku, c.category_name, p.price
         FROM product p
@@ -96,8 +96,10 @@ $result = mysqli_query($conn, $sql);
                 <li><a href="dashboard.php"><i class="fas fa-th-large"></i> <span>Dashboard</span></a></li>
                 <li><a href="stocks.php"><i class="fas fa-boxes"></i> <span>Products</span></a></li>
                 <li><a href="profit_status.php"><i class="fas fa-coins"></i> <span>Profit Status</span></a></li>
-                <li><a href="purchase-history.php"><i class="fas fa-history"></i><span>Transactions History</span></a></li>
-                <li class="active"><a href="archived_products.php"><i class="fas fa-archive"></i> <span>Archived Products</span></a></li>
+                <li><a href="purchase-history.php"><i class="fas fa-history"></i><span>Transactions History</span></a>
+                </li>
+                <li class="active"><a href="archived_products.php"><i class="fas fa-archive"></i> <span>Archived
+                            Products</span></a></li>
             </ul>
         </aside>
 
@@ -122,68 +124,86 @@ $result = mysqli_query($conn, $sql);
                     </div>
 
                     <div class="user-actions">
-                        <div class="user-profile-wrapper" style="position: relative !important; display: inline-block !important; vertical-align: middle;">
+                        <!-- NOTIFICATION WRAPPER -->
+                        <div class="notification-container">
+                            <button class="icon-btn" id="notifBtn">
+                                <i class="fas fa-bell"></i>
+                                <span class="notif-badge" id="notifCount">0</span>
+                            </button>
 
-                            <div id="profileBtn" onclick="toggleProfileMenu(event)"
-                                style="cursor: pointer; 
-                padding: 2px; 
-                display: flex; 
-                align-items: center; 
-                justify-content: center; 
-                transition: opacity 0.2s;"
-                                onmouseover="this.style.opacity='0.8'"
-                                onmouseout="this.style.opacity='1'">
-                                <i class="fas fa-user-circle" style="font-size: 24px !important; color: #333 !important;"></i>
+                            <div class="notif-dropdown" id="notifDropdown">
+                                <div class="notif-header">
+                                    <h3>Notifications</h3>
+                                    <span id="markRead" style="cursor:pointer;">Mark all as read</span>
+                                </div>
+                                <!-- This is where the separate file will inject the <li> items -->
+                                <ul class="notif-list" id="notifList"></ul>
+                                <div class="notif-footer">
+                                    <a href="all_notifications.php">View all alerts</a>
+                                </div>
                             </div>
+                        </div>
+                        <!-- Notification Ends here... -->
 
-                            <div id="profileDropdown"
-                                style="display: none; 
-                position: absolute !important; 
-                top: 40px !important; 
-                right: 0 !important; 
-                left: auto !important; 
-                width: 200px !important; 
-                background: #ffffff !important; 
-                border-radius: 12px !important; 
-                box-shadow: 0 10px 25px rgba(0,0,0,0.15) !important; 
-                border: 1px solid #edf2f7 !important; 
-                padding: 0 !important; 
-                z-index: 99999 !important;
-                overflow: hidden !important;">
+                        <!-- DROPDOWN WRAPPER -->
+                        <div class="user-profile-wrapper"
+                            style="position: relative !important; display: inline-block !important; vertical-align: middle;">
 
-                                <div style="padding: 12px 18px; border-bottom: 1px solid #f0f0f0; background: #fff; text-align: left !important;">
-                                    <strong style="display: block !important; color: #333 !important; font-size: 14px !important; line-height: 1.2 !important; margin: 0 !important;">
+                            <button class="icon-btn" id="profileBtn" style="cursor: pointer; 
+                                padding: 2px; 
+                                display: flex; 
+                                align-items: center; 
+                                justify-content: center; 
+                                transition: opacity 0.2s;" onmouseover="this.style.opacity='0.8'"
+                                onmouseout="this.style.opacity='1'">
+                                <i class="fas fa-user-circle"
+                                    style="font-size: 24px !important; color: #333 !important;"></i>
+                            </button>
+
+                            <div class="notif-dropdown" id="profileDropdown" style="display: none; 
+                                position: absolute !important; 
+                                top: 40px !important; 
+                                right: 0 !important; 
+                                left: auto !important; 
+                                width: 200px !important; 
+                                background: #ffffff !important; 
+                                border-radius: 12px !important; 
+                                box-shadow: 0 10px 25px rgba(0,0,0,0.15) !important; 
+                                border: 1px solid #edf2f7 !important; 
+                                padding: 0 !important; 
+                                z-index: 99999 !important;
+                                overflow: hidden !important;">
+                                <div
+                                    style="padding: 12px 18px; border-bottom: 1px solid #f0f0f0; background: #fff; text-align: left !important;">
+                                    <strong
+                                        style="display: block !important; color: #333 !important; font-size: 14px !important; line-height: 1.2 !important; margin: 0 !important;">
                                         <?php echo htmlspecialchars($_SESSION['username']); ?>
                                     </strong>
-                                    <span style="color: #888 !important; font-size: 12px !important; font-weight: normal !important;">
+                                    <span
+                                        style="color: #888 !important; font-size: 12px !important; font-weight: normal !important;">
                                         <?php echo htmlspecialchars(ucfirst($_SESSION['role'])); ?>
                                     </span>
                                 </div>
 
-                                <a href="change_password.php"
-                                    style="display: flex !important; 
-                                align-items: center !important; 
-                                gap: 10px !important; 
-                                padding: 12px 18px !important; 
-                                text-decoration: none !important; 
-                                color: #333 !important; 
-                                font-weight: 600 !important;
-                                background: #fff !important;
-                                font-size: 14px !important;
-                                justify-content: flex-start !important;
-                                width: 100% !important;
-                                white-space: nowrap !important;
-                                border-bottom: 1px solid #f0f0f0 !important;
-                                transition: background 0.2s;"
-                                    onmouseover="this.style.backgroundColor='#fffdf0'"
+                                <a href="change_password.php" style="display: flex !important; 
+                  align-items: center !important; 
+                  gap: 10px !important; 
+                  padding: 12px 18px !important; 
+                  text-decoration: none !important; 
+                  color: #333 !important; 
+                  font-weight: 600 !important;
+                  background: #fff !important;
+                  font-size: 14px !important;
+                  justify-content: flex-start !important;
+                  width: 100% !important;
+                  white-space: nowrap !important;
+                  border-bottom: 1px solid #f0f0f0 !important;
+                  transition: background 0.2s;" onmouseover="this.style.backgroundColor='#fffdf0'"
                                     onmouseout="this.style.backgroundColor='#ffffff'">
                                     <i class="fas fa-key" style="color: #f1c40f;"></i> Change Password
                                 </a>
 
-
-                                <a href="logout.php"
-                                    onclick="confirmLogout(event)"
-                                    style="display: flex !important; 
+                                <a href="logout.php" onclick="confirmLogout(event)" style="display: flex !important; 
                   align-items: center !important; 
                   gap: 10px !important; 
                   padding: 12px 18px !important; 
@@ -194,8 +214,7 @@ $result = mysqli_query($conn, $sql);
                   justify-content: flex-start !important;
                   width: 100% !important;
                   white-space: nowrap !important;
-                  transition: background 0.2s;"
-                                    onmouseover="this.style.backgroundColor='#fff5f5'"
+                  transition: background 0.2s;" onmouseover="this.style.backgroundColor='#fff5f5'"
                                     onmouseout="this.style.backgroundColor='#ffffff'">
                                     <i class="fas fa-sign-out-alt"></i> Log Out
                                 </a>
@@ -249,7 +268,8 @@ $result = mysqli_query($conn, $sql);
                         <?php if (mysqli_num_rows($result) === 0): ?>
                             <tr>
                                 <td colspan="5" style="text-align:center; padding: 40px; color: #999;">
-                                    <i class="fas fa-box-open" style="font-size: 32px; margin-bottom: 8px; display:block;"></i>
+                                    <i class="fas fa-box-open"
+                                        style="font-size: 32px; margin-bottom: 8px; display:block;"></i>
                                     No archived products found.
                                 </td>
                             </tr>
@@ -296,9 +316,9 @@ $result = mysqli_query($conn, $sql);
                 data.append('product_id', productId);
 
                 fetch('restore_product.php', {
-                        method: 'POST',
-                        body: data
-                    })
+                    method: 'POST',
+                    body: data
+                })
                     .then(res => res.text())
                     .then(response => {
                         if (response.trim() === 'success') {

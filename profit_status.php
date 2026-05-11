@@ -240,30 +240,30 @@ $year_data = mysqli_fetch_assoc(mysqli_query($conn, $year_sql));
                         <div class="user-profile-wrapper"
                             style="position: relative !important; display: inline-block !important; vertical-align: middle;">
 
-                            <div id="profileBtn" onclick="toggleProfileMenu(event)" style="cursor: pointer; 
-                padding: 2px; 
-                display: flex; 
-                align-items: center; 
-                justify-content: center; 
-                transition: opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+                            <button class="icon-btn" id="profileBtn" style="cursor: pointer; 
+                                padding: 2px; 
+                                display: flex; 
+                                align-items: center; 
+                                justify-content: center; 
+                                transition: opacity 0.2s;" onmouseover="this.style.opacity='0.8'"
+                                onmouseout="this.style.opacity='1'">
                                 <i class="fas fa-user-circle"
                                     style="font-size: 24px !important; color: #333 !important;"></i>
-                            </div>
+                            </button>
 
-                            <div id="profileDropdown" style="display: none; 
-                position: absolute !important; 
-                top: 40px !important; 
-                right: 0 !important; 
-                left: auto !important; 
-                width: 200px !important; 
-                background: #ffffff !important; 
-                border-radius: 12px !important; 
-                box-shadow: 0 10px 25px rgba(0,0,0,0.15) !important; 
-                border: 1px solid #edf2f7 !important; 
-                padding: 0 !important; 
-                z-index: 99999 !important;
-                overflow: hidden !important;">
-
+                            <div class="notif-dropdown" id="profileDropdown" style="display: none; 
+                                position: absolute !important; 
+                                top: 40px !important; 
+                                right: 0 !important; 
+                                left: auto !important; 
+                                width: 200px !important; 
+                                background: #ffffff !important; 
+                                border-radius: 12px !important; 
+                                box-shadow: 0 10px 25px rgba(0,0,0,0.15) !important; 
+                                border: 1px solid #edf2f7 !important; 
+                                padding: 0 !important; 
+                                z-index: 99999 !important;
+                                overflow: hidden !important;">
                                 <div
                                     style="padding: 12px 18px; border-bottom: 1px solid #f0f0f0; background: #fff; text-align: left !important;">
                                     <strong
@@ -277,19 +277,19 @@ $year_data = mysqli_fetch_assoc(mysqli_query($conn, $year_sql));
                                 </div>
 
                                 <a href="change_password.php" style="display: flex !important; 
-                                align-items: center !important; 
-                                gap: 10px !important; 
-                                padding: 12px 18px !important; 
-                                text-decoration: none !important; 
-                                color: #333 !important; 
-                                font-weight: 600 !important;
-                                background: #fff !important;
-                                font-size: 14px !important;
-                                justify-content: flex-start !important;
-                                width: 100% !important;
-                                white-space: nowrap !important;
-                                border-bottom: 1px solid #f0f0f0 !important;
-                                transition: background 0.2s;" onmouseover="this.style.backgroundColor='#fffdf0'"
+                  align-items: center !important; 
+                  gap: 10px !important; 
+                  padding: 12px 18px !important; 
+                  text-decoration: none !important; 
+                  color: #333 !important; 
+                  font-weight: 600 !important;
+                  background: #fff !important;
+                  font-size: 14px !important;
+                  justify-content: flex-start !important;
+                  width: 100% !important;
+                  white-space: nowrap !important;
+                  border-bottom: 1px solid #f0f0f0 !important;
+                  transition: background 0.2s;" onmouseover="this.style.backgroundColor='#fffdf0'"
                                     onmouseout="this.style.backgroundColor='#ffffff'">
                                     <i class="fas fa-key" style="color: #f1c40f;"></i> Change Password
                                 </a>
@@ -311,7 +311,6 @@ $year_data = mysqli_fetch_assoc(mysqli_query($conn, $year_sql));
                                 </a>
                             </div>
                         </div>
-
 
                     </div>
                 </div>

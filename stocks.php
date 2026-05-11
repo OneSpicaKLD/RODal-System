@@ -166,46 +166,49 @@ while ($cat = mysqli_fetch_assoc($cat_result_modal)) {
                                 <i class="fas fa-bell"></i>
                                 <span class="notif-badge" id="notifCount">0</span>
                             </button>
+
                             <div class="notif-dropdown" id="notifDropdown">
                                 <div class="notif-header">
                                     <h3>Notifications</h3>
                                     <span id="markRead" style="cursor:pointer;">Mark all as read</span>
                                 </div>
+                                <!-- This is where the separate file will inject the <li> items -->
                                 <ul class="notif-list" id="notifList"></ul>
                                 <div class="notif-footer">
                                     <a href="all_notifications.php">View all alerts</a>
                                 </div>
                             </div>
                         </div>
+                        <!-- Notification Ends here... -->
 
                         <!-- DROPDOWN WRAPPER -->
                         <div class="user-profile-wrapper"
                             style="position: relative !important; display: inline-block !important; vertical-align: middle;">
 
-                            <div id="profileBtn" onclick="toggleProfileMenu(event)" style="cursor: pointer; 
-                padding: 2px; 
-                display: flex; 
-                align-items: center; 
-                justify-content: center; 
-                transition: opacity 0.2s;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+                            <button class="icon-btn" id="profileBtn" style="cursor: pointer; 
+                                padding: 2px; 
+                                display: flex; 
+                                align-items: center; 
+                                justify-content: center; 
+                                transition: opacity 0.2s;" onmouseover="this.style.opacity='0.8'"
+                                onmouseout="this.style.opacity='1'">
                                 <i class="fas fa-user-circle"
                                     style="font-size: 24px !important; color: #333 !important;"></i>
-                            </div>
+                            </button>
 
-                            <div id="profileDropdown" style="display: none; 
-                position: absolute !important; 
-                top: 40px !important; 
-                right: 0 !important; 
-                left: auto !important; 
-                width: 200px !important; 
-                background: #ffffff !important; 
-                border-radius: 12px !important; 
-                box-shadow: 0 10px 25px rgba(0,0,0,0.15) !important; 
-                border: 1px solid #edf2f7 !important; 
-                padding: 0 !important; 
-                z-index: 99999 !important;
-                overflow: hidden !important;">
-
+                            <div class="notif-dropdown" id="profileDropdown" style="display: none; 
+                                position: absolute !important; 
+                                top: 40px !important; 
+                                right: 0 !important; 
+                                left: auto !important; 
+                                width: 200px !important; 
+                                background: #ffffff !important; 
+                                border-radius: 12px !important; 
+                                box-shadow: 0 10px 25px rgba(0,0,0,0.15) !important; 
+                                border: 1px solid #edf2f7 !important; 
+                                padding: 0 !important; 
+                                z-index: 99999 !important;
+                                overflow: hidden !important;">
                                 <div
                                     style="padding: 12px 18px; border-bottom: 1px solid #f0f0f0; background: #fff; text-align: left !important;">
                                     <strong
@@ -218,22 +221,20 @@ while ($cat = mysqli_fetch_assoc($cat_result_modal)) {
                                     </span>
                                 </div>
 
-                                <a href="change_password.php"
-                                    style="display: flex !important; 
-                                    align-items: center !important; 
-                                    gap: 10px !important; 
-                                    padding: 12px 18px !important; 
-                                    text-decoration: none !important; 
-                                    color: #333 !important; 
-                                    font-weight: 600 !important;
-                                    background: #fff !important;
-                                    font-size: 14px !important;
-                                    justify-content: flex-start !important;
-                                    width: 100% !important;
-                                    white-space: nowrap !important;
-                                    border-bottom: 1px solid #f0f0f0 !important;
-                                    transition: background 0.2s;"
-                                    onmouseover="this.style.backgroundColor='#fffdf0'"
+                                <a href="change_password.php" style="display: flex !important; 
+                  align-items: center !important; 
+                  gap: 10px !important; 
+                  padding: 12px 18px !important; 
+                  text-decoration: none !important; 
+                  color: #333 !important; 
+                  font-weight: 600 !important;
+                  background: #fff !important;
+                  font-size: 14px !important;
+                  justify-content: flex-start !important;
+                  width: 100% !important;
+                  white-space: nowrap !important;
+                  border-bottom: 1px solid #f0f0f0 !important;
+                  transition: background 0.2s;" onmouseover="this.style.backgroundColor='#fffdf0'"
                                     onmouseout="this.style.backgroundColor='#ffffff'">
                                     <i class="fas fa-key" style="color: #f1c40f;"></i> Change Password
                                 </a>
@@ -277,7 +278,7 @@ while ($cat = mysqli_fetch_assoc($cat_result_modal)) {
                             $url_params .= '&category=' . urlencode($category);
                         if ($sort !== 'default')
                             $url_params .= '&sort=' . urlencode($sort); // <--- ADD THIS
-
+                        
                         ?>
                         <div class="pagination">
                             <?php if ($page > 1): ?>
@@ -405,7 +406,7 @@ while ($cat = mysqli_fetch_assoc($cat_result_modal)) {
                             $stock = $row['total_in'] - $row['total_out'];
                             $sold = $row['total_out'];
                             $catAttr = strtoupper(str_replace(' ', '_', $row['category_name']));
-                        ?>
+                            ?>
                             <tr data-category="<?php echo $catAttr; ?>">
                                 <td><?php echo htmlspecialchars($row['product_name']); ?></td>
                                 <td><?php echo ucwords(strtolower(str_replace('_', ' ', $row['category_name']))); ?></td>
