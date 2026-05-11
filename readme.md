@@ -30,9 +30,10 @@ This system was developed as a collaboration for the partial completion of the f
 ## 🛠 Developer Guidelines
 To maintain code integrity and system stability, all developers must adhere to the following:
 
-1. **Code Integrity**: Do not alter irrelevant PHP code or core database logic without prior discussion.
-2. **Database Configuration**: Do **NOT** add unnecessary ports or hardcode personal credentials. Edit the port only in `db_connect.php` to match your local XAMPP environment.
-3. **Commit Cleanly**: Always provide a clear description when pushing updates to the repository.
+1. **Run the SQL File**: Run the SQL File to ensure system works smoothly
+2. **Code Integrity**: Do not alter irrelevant PHP code or core database logic without prior discussion.
+3. **Database Configuration**: Do **NOT** add unnecessary ports or hardcode personal credentials. Edit the port only in `db_connect.php` to match your local XAMPP environment.
+4. **Commit Cleanly**: Always provide a clear description when pushing updates to the repository.
 
 ---
 *Developed with ❤️ for the Rodal Store Community.*
