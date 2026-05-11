@@ -15,22 +15,28 @@ $category = (isset($_GET['category']) && $_GET['category'] !== 'all') ? mysqli_r
 $sort = $_GET['sort'] ?? 'newest';
 
 // 3. Define Sorting logic
+// 3. Define Sorting logic (Updated for Audit-Proof Math)
 switch ($sort) {
     case 'oldest':
         $orderBy = "st.transaction_id ASC";
         break;
     case 'highest_val':
-        $orderBy = "(st.quantity * p.price) DESC";
+        // Sorts by the total transaction value (buy_amount for IN, sell_amount for OUT)
+        $orderBy = "(CASE WHEN st.transaction_type = 'IN' THEN st.buy_amount ELSE st.sell_amount END) DESC";
         break;
     case 'lowest_val':
-        $orderBy = "(st.quantity * p.price) ASC";
+        $orderBy = "(CASE WHEN st.transaction_type = 'IN' THEN st.buy_amount ELSE st.sell_amount END) ASC";
         break;
     case 'type':
-        $orderBy = "st.transaction_type ASC, st.transaction_date DESC";
+        // Groups by type, then by most recent date
+        $orderBy = "st.transaction_type DESC, st.transaction_date DESC";
         break;
+    case 'newest':
     default:
         $orderBy = "st.transaction_id DESC";
+        break;
 }
+
 
 // 4. Setup Pagination
 $limit = 10;
@@ -59,8 +65,16 @@ $total_rows = $total_row_data['total'];
 $total_pages = ceil($total_rows / $limit); // <--- Fixed the Undefined Variable error
 
 // 7. Main Transaction Query
-$sql = "SELECT st.transaction_id, st.transaction_date, st.transaction_type, st.quantity, st.related_tid,
-               p.product_name, p.price, c.category_name
+$sql = "SELECT 
+            st.transaction_id, 
+            st.transaction_date, 
+            st.transaction_type, 
+            st.quantity, 
+            st.related_tid,
+            st.buy_amount,  -- Historical cost at time of restock
+            st.sell_amount, -- Historical price at time of sale
+            p.product_name, 
+            c.category_name
         FROM stock_transaction st
         JOIN product p ON st.product_id = p.product_id
         JOIN category c ON p.category_id = c.category_id
@@ -69,6 +83,7 @@ $sql = "SELECT st.transaction_id, st.transaction_date, st.transaction_type, st.q
         LIMIT $limit OFFSET $offset";
 
 $result = mysqli_query($conn, $sql);
+
 ?>
 
 
@@ -362,7 +377,7 @@ $result = mysqli_query($conn, $sql);
                             <th>Type</th>
                             <th>Category</th>
                             <th>Products</th>
-                            <th>Price</th>
+                            <th>Price/Cost</th>
                             <th>Quantity</th>
                             <th>Subtotal</th>
                             <th>Actions</th> <!-- Far right is best -->
@@ -439,38 +454,39 @@ $result = mysqli_query($conn, $sql);
                             if ($result && $result->num_rows > 0) {
 
                                 while ($row = $result->fetch_assoc()) {
-
                                     $transaction_id = $row['transaction_id'];
-
-                                    $subtotal = $row['price'] * $row['quantity'];
-                                    ?>
-                                    <?php
-                                    // 1. Logic for Type Badge (PLACE THIS RIGHT BEFORE YOUR <tr>)
                                     $type = $row['transaction_type'];
+                                    $qty = abs($row['quantity']); // Use absolute value for the division
+                        
+                                    // 1. Identify the TOTAL amount from the DB
+                                    $totalAmount = ($type === 'IN') ? $row['buy_amount'] : $row['sell_amount'];
 
+                                    // 2. CALCULATE UNIT PRICE (Total / Quantity)
+                                    $unitPrice = ($qty > 0) ? ($totalAmount / $qty) : 0;
+
+                                    // 3. SUBTOTAL is the total amount itself
+                                    $subtotal = $totalAmount;
+
+                                    // --- Badge Logic follows below ---
+                                    // --- Badge Logic ---
                                     if ($type === 'ADJUSTMENT') {
                                         $typeLabel = 'Adjustment';
-                                        $typeColor = '#7f8c8d'; // Gray for corrections
+                                        $typeColor = '#7f8c8d';
                                     } else {
                                         $isRestock = ($type === 'IN');
                                         $typeLabel = $isRestock ? 'Restock' : 'Sale';
-                                        $typeColor = $isRestock ? '#3498db' : '#2e7d32'; // Blue for IN, Green for OUT
+                                        $typeColor = $isRestock ? '#3498db' : '#2e7d32';
                                     }
-
-                                    $subtotal = $row['price'] * $row['quantity'];
                                     ?>
                                     <tr>
-                                        <!-- 1. Date & Time -->
                                         <td style="color: #666; font-size: 0.9rem;">
                                             <?php echo date('M d, Y h:i A', strtotime($row['transaction_date'])); ?>
                                         </td>
 
-                                        <!-- transaction id -->
                                         <td style="color: #666; font-size: 0.9rem;">
                                             <?php echo $transaction_id; ?>
                                         </td>
 
-                                        <!-- 2. Transaction Type -->
                                         <td>
                                             <span
                                                 style="background: <?php echo $typeColor; ?>; color: white; padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase;">
@@ -478,38 +494,28 @@ $result = mysqli_query($conn, $sql);
                                             </span>
                                         </td>
 
-                                        <!-- 3. Category -->
                                         <td><?php echo htmlspecialchars(str_replace('_', ' ', $row['category_name'])); ?></td>
-
-                                        <!-- 4. Products -->
                                         <td><?php echo htmlspecialchars($row['product_name']); ?></td>
 
-                                        <!-- 5. Price -->
+                                        <!-- Updated Price Column -->
                                         <td style="font-weight:bold; color:#2e7d32;">
-                                            ₱<?php echo number_format($row['price'], 2); ?>
+                                            ₱<?php echo number_format($unitPrice, 2); ?>
                                         </td>
 
-                                        <!-- 6. Quantity -->
                                         <td><?php echo $row['quantity']; ?></td>
 
-                                        <!-- 7. Subtotal -->
+                                        <!-- Updated Subtotal Column -->
                                         <td style="font-weight:bold; color:#333;">
                                             ₱<?php echo number_format($subtotal, 2); ?>
                                         </td>
-                                        <!-- 8. Action -->
+
                                         <td>
-                                            <?php
-                                            // Show Reverse button ONLY if:
-                                            // 1. It is NOT an adjustment entry itself
-                                            // 2. AND it hasn't been fixed yet (related_tid is empty)
-                                            if ($row['transaction_type'] !== 'ADJUSTMENT' && empty($row['related_tid'])):
-                                                ?>
+                                            <?php if ($row['transaction_type'] !== 'ADJUSTMENT' && empty($row['related_tid'])): ?>
                                                 <button class="sell-btn"
                                                     onclick="confirmReversal(<?php echo $row['transaction_id']; ?>, <?php echo $row['quantity']; ?>, '<?php echo htmlspecialchars($row['product_name']); ?>')">
                                                     <i class="fas fa-undo"></i> Reverse
                                                 </button>
                                             <?php else: ?>
-                                                <!-- This part shows once the transaction is reversed -->
                                                 <span style="color: #999; font-style: italic; font-size: 0.8rem;">
                                                     <?php
                                                     if ($row['transaction_type'] === 'ADJUSTMENT') {
@@ -521,11 +527,10 @@ $result = mysqli_query($conn, $sql);
                                                 </span>
                                             <?php endif; ?>
                                         </td>
-
                                     </tr>
-
                                     <?php
                                 }
+
                             } else {
                                 echo "<tr><td colspan='6' style='text-align:center;'>No transactions found.</td></tr>";
                             }

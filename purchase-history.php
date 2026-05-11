@@ -9,47 +9,81 @@ if (!isset($_SESSION['isLoggedIn'])) {
 require 'db_connect.php';
 
 // 1. Capture All Filters
-$search = isset($_GET['search']) ? mysqli_real_escape_string($conn, $_GET['search']) : '';
+$search = isset($_GET['search']) ? mysqli_real_escape_string($conn, trim($_GET['search'])) : '';
 $category = (isset($_GET['category']) && $_GET['category'] !== 'all') ? mysqli_real_escape_string($conn, $_GET['category']) : '';
+$sort = $_GET['sort'] ?? 'newest'; // Capture the sort parameter
 
-// 2. Setup Pagination Variables
+// 2. Define Sorting Logic (THIS FIXES THE FATAL ERROR)
+switch ($sort) {
+    case 'oldest':
+        $orderBy = "st.transaction_id ASC";
+        break;
+    case 'highest_val':
+        // Sort by the TOTAL cash value (not the unit price)
+        $orderBy = "(CASE WHEN st.transaction_type = 'IN' THEN st.buy_amount ELSE st.sell_amount END) DESC";
+        break;
+    case 'lowest_val':
+        // This will put the ₱0.00 and ₱8.00 transactions at the very top
+        $orderBy = "(CASE WHEN st.transaction_type = 'IN' THEN st.buy_amount ELSE st.sell_amount END) ASC";
+        break;
+    case 'type':
+        $orderBy = "st.transaction_type DESC, st.transaction_date DESC";
+        break;
+
+    default:
+        $orderBy = "st.transaction_id DESC";
+}
+
+
+// 3. Setup Pagination Variables
 $limit = 10;
-$page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
+$page = isset($_GET['page']) ? max(1, (int) $_GET['page']) : 1;
 $offset = ($page - 1) * $limit;
 
-// 3. Build Dynamic WHERE Clause
+// 4. Build Dynamic WHERE Clause
 $conditions = [];
-$conditions[] = "p.product_name LIKE '%$search%'";
+if (!empty($search)) {
+    $conditions[] = "p.product_name LIKE '%$search%'";
+}
 
 if (!empty($category)) {
     $conditions[] = "c.category_name = '$category'";
 }
 
-$whereClause = "WHERE " . implode(" AND ", $conditions);
+$whereClause = !empty($conditions) ? "WHERE " . implode(" AND ", $conditions) : "";
 
-// 4. Get Total Count (For Pagination)
+// 5. Get Total Count
 $total_query = "SELECT COUNT(*) as total 
-                FROM product p 
+                FROM stock_transaction st
+                JOIN product p ON st.product_id = p.product_id
                 JOIN category c ON p.category_id = c.category_id 
                 $whereClause";
 $total_results_res = mysqli_query($conn, $total_query);
 $total_row = mysqli_fetch_assoc($total_results_res);
-$total_pages = ceil($total_row['total'] / $limit);
+$total_rows = $total_row['total'] ?? 0;
+$total_pages = ceil($total_rows / $limit);
 
-// 5. Main Data Query
-$sql = "SELECT p.product_id, p.product_name, c.category_name, p.price,
-        SUM(CASE WHEN t.transaction_type = 'IN' THEN t.quantity ELSE 0 END) as total_in,
-        SUM(CASE WHEN t.transaction_type = 'OUT' THEN t.quantity ELSE 0 END) as total_out
-        FROM product p
+// 6. Main Transaction Query
+$sql = "SELECT 
+            st.transaction_id, 
+            st.transaction_date, 
+            st.transaction_type, 
+            st.quantity, 
+            st.related_tid,
+            st.buy_amount,
+            st.sell_amount,
+            p.product_name, 
+            c.category_name
+        FROM stock_transaction st
+        JOIN product p ON st.product_id = p.product_id
         JOIN category c ON p.category_id = c.category_id
-        LEFT JOIN stock_transaction t ON p.product_id = t.product_id
         $whereClause
-        GROUP BY p.product_id
-        ORDER BY p.product_id ASC
+        ORDER BY $orderBy 
         LIMIT $limit OFFSET $offset";
 
 $result = mysqli_query($conn, $sql);
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -167,8 +201,7 @@ $result = mysqli_query($conn, $sql);
                                     </span>
                                 </div>
 
-                                <a href="change_password.php"
-                                    style="display: flex !important; 
+                                <a href="change_password.php" style="display: flex !important; 
                                 align-items: center !important; 
                                 gap: 10px !important; 
                                 padding: 12px 18px !important; 
@@ -181,8 +214,7 @@ $result = mysqli_query($conn, $sql);
                                 width: 100% !important;
                                 white-space: nowrap !important;
                                 border-bottom: 1px solid #f0f0f0 !important;
-                                transition: background 0.2s;"
-                                    onmouseover="this.style.backgroundColor='#fffdf0'"
+                                transition: background 0.2s;" onmouseover="this.style.backgroundColor='#fffdf0'"
                                     onmouseout="this.style.backgroundColor='#ffffff'">
                                     <i class="fas fa-key" style="color: #f1c40f;"></i> Change Password
                                 </a>
@@ -251,8 +283,33 @@ $result = mysqli_query($conn, $sql);
                 $currentCat = $_GET['category'] ?? 'all';
                 ?>
 
-                <form method="GET" id="filterForm" action="purchase-history.php">
+                <form method="GET" id="filterForm" action="purchase-history.php" style="display: flex; gap: 15px;">
                     <input type="hidden" name="search" value="<?php echo htmlspecialchars($search); ?>">
+
+                    <div class="modern-dropdown" id="sortDropdown">
+                        <div class="dropdown-trigger">
+                            <span>
+                                <?php
+                                $labels = ['newest' => 'Newest First', 'oldest' => 'Oldest First', 'highest_val' => 'Value: High-Low', 'lowest_val' => 'Value: Low-High', 'type' => 'Group by Type'];
+                                echo $labels[$sort] ?? 'Newest First';
+                                ?>
+                            </span>
+                            <i class="fas fa-sort-amount-down"></i>
+                        </div>
+                        <ul class="dropdown-menu">
+                            <li data-value="newest" class="<?php echo ($sort == 'newest') ? 'active' : ''; ?>">Newest
+                                First</li>
+                            <li data-value="oldest" class="<?php echo ($sort == 'oldest') ? 'active' : ''; ?>">Oldest
+                                First</li>
+                            <li data-value="highest_val"
+                                class="<?php echo ($sort == 'highest_val') ? 'active' : ''; ?>">Value: High to Low</li>
+                            <li data-value="lowest_val" class="<?php echo ($sort == 'lowest_val') ? 'active' : ''; ?>">
+                                Value: Low to High</li>
+                            <li data-value="type" class="<?php echo ($sort == 'type') ? 'active' : ''; ?>">Group by Type
+                            </li>
+                        </ul>
+                        <input type="hidden" name="sort" value="<?php echo htmlspecialchars($sort); ?>">
+                    </div>
 
                     <div class="modern-dropdown" id="categoryDropdown">
                         <div class="dropdown-trigger">
@@ -301,112 +358,59 @@ $result = mysqli_query($conn, $sql);
 
                     <tbody>
                         <?php
-                        /* SEARCH */
-                        $search = isset($_GET['search']) ? trim($_GET['search']) : '';
-
-                        /* CATEGORY */
-                        $selectedCat = $_GET['category'] ?? 'all';
-
-                        /* PAGINATION */
-                        $limit = 10;
-                        $page = isset($_GET['page']) ? max(1, (int) $_GET['page']) : 1;
-                        $offset = ($page - 1) * $limit;
-
-                        /* WHERE CONDITIONS */
-                        $where = [];
-
-                        if (!empty($search)) {
-                            $searchSafe = $conn->real_escape_string($search);
-                            $where[] = "p.product_name LIKE '%$searchSafe%'";
-                        }
-
-                        if ($selectedCat !== 'all' && !empty($selectedCat)) {
-                            $catSafe = $conn->real_escape_string($selectedCat);
-                            $where[] = "c.category_name = '$catSafe'";
-                        }
-
-                        $whereSQL = '';
-                        if (!empty($where)) {
-                            $whereSQL = "WHERE " . implode(" AND ", $where);
-                        }
-
-                        /* COUNT FOR PAGINATION */
-                        $countSql = "SELECT COUNT(*) AS total
-                 FROM stock_transaction st
-                 JOIN product p ON st.product_id = p.product_id
-                 JOIN category c ON p.category_id = c.category_id
-                 $whereSQL";
-
-                        $countRes = $conn->query($countSql);
-                        $countRow = $countRes->fetch_assoc();
-                        $total_rows = $countRow['total'];
-                        $total_pages = ceil($total_rows / $limit);
-
-                        /* MAIN QUERY WITH LIMIT */
-                        $sql = "SELECT 
-                            c.category_name,
-                            p.product_name,
-                            p.price,
-                            st.quantity,
-                            st.related_tid,
-                            st.transaction_id,
-                            st.transaction_type,  
-                            st.transaction_date 
-                            FROM stock_transaction st
-                            JOIN product p ON st.product_id = p.product_id
-                            JOIN category c ON p.category_id = c.category_id
-                            $whereSQL
-                            ORDER BY st.transaction_id DESC
-                            LIMIT $limit OFFSET $offset";
-                        $result = $conn->query($sql);
-
+                        // We REMOVED the redundant SQL here because it's already handled at the TOP of the file.
+                        // This ensures $result uses the sorting and historical columns from the main query.
+                        
                         if ($result && $result->num_rows > 0) {
-
                             while ($row = $result->fetch_assoc()) {
-
                                 $transaction_id = $row['transaction_id'];
-
-                                $subtotal = $row['price'] * $row['quantity'];
-                        ?>
-                                <?php
-                                // 1. Logic for Type Badge (PLACE THIS RIGHT BEFORE YOUR <tr>)
                                 $type = $row['transaction_type'];
 
+                                // 1. Get the absolute quantity to avoid math errors with negative adjustments
+                                $qty = abs($row['quantity']);
+
+                                // 2. Identify which total amount to use
+                                $totalAmount = ($type === 'IN') ? $row['buy_amount'] : $row['sell_amount'];
+
+                                // 3. CALCULATE THE UNIT PRICE (Total / Quantity)
+                                // This turns ₱9,000.00 into ₱10.00 if the quantity is 900
+                                $unitPrice = ($qty > 0) ? ($totalAmount / $qty) : 0;
+
+                                // 4. The Subtotal is just the original amount from the database
+                                $subtotal = $totalAmount;
+                                // 2. Badge Logic
                                 if ($type === 'ADJUSTMENT') {
                                     $typeLabel = 'Adjustment';
-                                    $typeColor = '#7f8c8d'; // Gray for corrections
+                                    $typeColor = '#7f8c8d';
                                 } else {
                                     $isRestock = ($type === 'IN');
                                     $typeLabel = $isRestock ? 'Restock' : 'Sale';
-                                    $typeColor = $isRestock ? '#3498db' : '#2e7d32'; // Blue for IN, Green for OUT
+                                    $typeColor = $isRestock ? '#3498db' : '#2e7d32';
                                 }
-
-                                $subtotal = $row['price'] * $row['quantity'];
                                 ?>
                                 <tr>
-                                    <!-- 1. Date & Time -->
+                                    <!-- Date & Time -->
                                     <td style="color: #666; font-size: 0.9rem;">
                                         <?php echo date('M d, Y h:i A', strtotime($row['transaction_date'])); ?>
                                     </td>
 
+                                    <!-- Transaction ID -->
                                     <td style="color: #666; font-size: 0.9rem;">
                                         <?php echo $transaction_id; ?>
                                     </td>
 
-                                    <!-- 2. Transaction Type -->
+                                    <!-- Transaction Type & Paper Trail -->
                                     <td>
-                                        <!-- The Main Badge -->
                                         <span
                                             style="background: <?php echo $typeColor; ?>; color: white; padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase;">
                                             <?php echo $typeLabel; ?>
                                         </span>
 
-                                        <!-- The "Paper Trail" (Only shows IF there is a link) -->
                                         <?php if (!empty($row['related_tid'])): ?>
                                             <div
                                                 style="font-size: 0.65rem; color: #7f8c8d; margin-top: 4px; font-style: italic; line-height: 1;">
                                                 <?php
-                                                echo ($row['transaction_type'] === 'ADJUSTMENT')
+                                                echo ($type === 'ADJUSTMENT')
                                                     ? "Adjustment of Transaction #" . $row['related_tid']
                                                     : "Fixed by Transaction #" . $row['related_tid'];
                                                 ?>
@@ -414,41 +418,40 @@ $result = mysqli_query($conn, $sql);
                                         <?php endif; ?>
                                     </td>
 
-                                    <!-- 3. Category -->
+                                    <!-- Category -->
                                     <td><?php echo htmlspecialchars(str_replace('_', ' ', $row['category_name'])); ?></td>
 
-                                    <!-- 4. Products -->
+                                    <!-- Products -->
                                     <td><?php echo htmlspecialchars($row['product_name']); ?></td>
 
-                                    <!-- 5. Price -->
+                                    <!-- Price (NOW USING HISTORICAL UNIT PRICE) -->
                                     <td style="font-weight:bold; color:#2e7d32;">
-                                        ₱<?php echo number_format($row['price'], 2); ?>
+                                        ₱<?php echo number_format($unitPrice, 2); ?>
                                     </td>
 
-                                    <!-- 6. Quantity -->
+                                    <!-- Quantity -->
                                     <td><?php echo $row['quantity']; ?></td>
 
-                                    <!-- 7. Subtotal -->
+                                    <!-- Subtotal (NOW USING HISTORICAL SUBTOTAL) -->
                                     <td style="font-weight:bold; color:#333;">
                                         ₱<?php echo number_format($subtotal, 2); ?>
                                     </td>
                                 </tr>
-
-                        <?php
+                                <?php
                             }
                         } else {
                             echo "<tr><td colspan='8' style='text-align:center;'>No transactions found.</td></tr>";
                         }
-
                         ?>
                     </tbody>
+
                 </table>
             </div>
 
 
             <script>
                 document.querySelectorAll(".delete-btn").forEach(button => {
-                    button.addEventListener("click", function() {
+                    button.addEventListener("click", function () {
                         const transactionId = this.getAttribute('data-id'); // Kunin ang ID mula sa button
                         const row = this.closest("tr"); // Kunin ang table row para matanggal mamaya
 

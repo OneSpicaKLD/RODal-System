@@ -413,7 +413,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const filterForm = document.getElementById('filterForm');
     if (!filterForm) return;
 
-    // We find ALL modern-dropdowns (Category AND Sort)
     const dropdowns = document.querySelectorAll('.modern-dropdown');
 
     dropdowns.forEach(dropdown => {
@@ -426,7 +425,6 @@ document.addEventListener('DOMContentLoaded', function () {
         trigger.addEventListener('click', function (e) {
             e.stopPropagation();
 
-            // Close other dropdowns first so they don't overlap
             dropdowns.forEach(d => {
                 if (d !== dropdown) d.classList.remove('is-open');
             });
@@ -434,28 +432,23 @@ document.addEventListener('DOMContentLoaded', function () {
             dropdown.classList.toggle('is-open');
         });
 
-        // 2. Handle Item Selection
         menuItems.forEach(item => {
             item.addEventListener('click', function () {
                 const val = this.getAttribute('data-value');
                 const text = this.innerText;
 
-                // Update UI & Hidden Input
                 hiddenInput.value = val;
                 if (displaySpan) displaySpan.innerText = text;
 
-                // Update 'active' class on list items
                 menuItems.forEach(li => li.classList.remove('active'));
                 this.classList.add('active');
 
-                // Close and Submit
                 dropdown.classList.remove('is-open');
-                filterForm.submit(); // This refreshes the page with Category + Sort + Search
+                filterForm.submit(); 
             });
         });
     });
 
-    // 3. Global click to close dropdowns
     window.addEventListener('click', function () {
         dropdowns.forEach(d => d.classList.remove('is-open'));
     });
@@ -665,58 +658,51 @@ window.onclick = function () {
     });
 };
 
-document.addEventListener('DOMContentLoaded', function () {
-    // Select all modern dropdowns on the page
-    const allDropdowns = document.querySelectorAll('.modern-dropdown');
+// document.addEventListener('DOMContentLoaded', function () {
+    
+//     const allDropdowns = document.querySelectorAll('.modern-dropdown');
 
-    allDropdowns.forEach(dropdown => {
-        const trigger = dropdown.querySelector('.dropdown-trigger');
-        const menuItems = dropdown.querySelectorAll('.dropdown-menu li');
-        const hiddenInput = dropdown.querySelector('input[type="hidden"]');
-        const displaySpan = trigger.querySelector('span');
-        const parentForm = dropdown.closest('form');
+//     allDropdowns.forEach(dropdown => {
+//         const trigger = dropdown.querySelector('.dropdown-trigger');
+//         const menuItems = dropdown.querySelectorAll('.dropdown-menu li');
+//         const hiddenInput = dropdown.querySelector('input[type="hidden"]');
+//         const displaySpan = trigger.querySelector('span');
+//         const parentForm = dropdown.closest('form');
 
-        // Toggle Open/Close
-        trigger.addEventListener('click', function (e) {
-            e.stopPropagation();
-            // Close other dropdowns first
-            allDropdowns.forEach(other => {
-                if (other !== dropdown) other.classList.remove('is-open');
-            });
-            dropdown.classList.toggle('is-open');
-        });
+//         trigger.addEventListener('click', function (e) {
+//             e.stopPropagation();
+//             allDropdowns.forEach(other => {
+//                 if (other !== dropdown) other.classList.remove('is-open');
+//             });
+//             dropdown.classList.toggle('is-open');
+//         });
 
-        // Selection Logic
-        menuItems.forEach(item => {
-            item.addEventListener('click', function () {
-                const val = this.getAttribute('data-value');
-                const text = this.innerText;
+//         menuItems.forEach(item => {
+//             item.addEventListener('click', function () {
+//                 const val = this.getAttribute('data-value');
+//                 const text = this.innerText;
 
-                // Update UI
-                hiddenInput.value = val;
-                displaySpan.innerText = text;
+//                 hiddenInput.value = val;
+//                 displaySpan.innerText = text;
 
-                // Close and handle actions
-                dropdown.classList.remove('is-open');
+//                 dropdown.classList.remove('is-open');
 
-                // If it's a form-based dropdown (like Year), submit it
-                if (parentForm) {
-                    parentForm.submit();
-                }
+//                 if (parentForm) {
+//                     parentForm.submit();
+//                 }
 
-                // If you have the filterCategory function active on this page, run it
-                if (typeof filterCategory === "function") {
-                    filterCategory();
-                }
-            });
-        });
-    });
+//                 if (typeof filterCategory === "function") {
+//                     filterCategory();
+//                 }
+//             });
+//         });
+//     });
 
-    // Close all if clicking anywhere else
-    window.addEventListener('click', () => {
-        allDropdowns.forEach(d => d.classList.remove('is-open'));
-    });
-});
+//     // Close all if clicking anywhere else
+//     window.addEventListener('click', () => {
+//         allDropdowns.forEach(d => d.classList.remove('is-open'));
+//     });
+// });
 
 
 function restoreProduct(productId, productName) {
