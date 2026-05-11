@@ -932,6 +932,8 @@
 
     /* CATEGORY */
 
+
+
     .modern-dropdown {
         position: relative;
         width: 230px;
@@ -1485,9 +1487,22 @@
     .section-head {
         display: flex;
         justify-content: space-between;
+        /* Pushes title to left and filters to right */
         align-items: center;
-        margin-bottom: 11px;
+        /* Vertically centers them */
+        flex-wrap: wrap;
+        /* Allows wrapping on small mobile screens */
+        gap: 20px;
+        /* Space between "TOTAL REVENUE" and the filters */
+        margin-bottom: 20px;
     }
+
+    .section-head h2 {
+        margin: 0;
+        white-space: nowrap;
+        /* Prevents "TOTAL REVENUE" from breaking into two lines */
+    }
+
 
     /* TITLES */
     .stat-group h2 {
@@ -1496,6 +1511,22 @@
         font-weight: 800;
         letter-spacing: 1px;
         color: #1f2937;
+    }
+
+    /* Align the individual dropdowns inside the form horizontally */
+    .filter-group {
+        display: flex;
+        flex-direction: row;
+        /* Forces horizontal alignment */
+        align-items: center;
+        gap: 10px;
+        /* Space between Year, Month, and Day boxes */
+    }
+
+    .modern-dropdown {
+        position: relative;
+        /* Set a fixed width that fits the longest month name (September) */
+        width: 140px;
     }
 
     /* YEAR FILTER */

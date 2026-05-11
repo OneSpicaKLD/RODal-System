@@ -55,10 +55,111 @@ $month = mysqli_fetch_assoc(mysqli_query($conn, $month_sql));
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="script.js"></script>
 
-    <style>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
 
-    </style>
+            const allDropdowns = document.querySelectorAll('.modern-dropdown');
+
+            allDropdowns.forEach(dropdown => {
+                const trigger = dropdown.querySelector('.dropdown-trigger');
+                const menuItems = dropdown.querySelectorAll('.dropdown-menu li');
+                const hiddenInput = dropdown.querySelector('input[type="hidden"]');
+                const displaySpan = trigger.querySelector('span');
+                const parentForm = dropdown.closest('form');
+
+                trigger.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    allDropdowns.forEach(other => {
+                        if (other !== dropdown) other.classList.remove('is-open');
+                    });
+                    dropdown.classList.toggle('is-open');
+                });
+
+                menuItems.forEach(item => {
+                    item.addEventListener('click', function() {
+                        const val = this.getAttribute('data-value');
+                        const text = this.innerText;
+
+                        hiddenInput.value = val;
+                        displaySpan.innerText = text;
+
+                        dropdown.classList.remove('is-open');
+
+                        if (parentForm) {
+                            parentForm.submit();
+                        }
+
+                        if (typeof filterCategory === "function") {
+                            filterCategory();
+                        }
+                    });
+                });
+            });
+
+            // Close all if clicking anywhere else
+            window.addEventListener('click', () => {
+                allDropdowns.forEach(d => d.classList.remove('is-open'));
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const allDropdowns = document.querySelectorAll('.modern-dropdown');
+
+            allDropdowns.forEach(dropdown => {
+                const trigger = dropdown.querySelector('.dropdown-trigger');
+                const menuItems = dropdown.querySelectorAll('.dropdown-menu li');
+                const displaySpan = trigger.querySelector('span');
+
+                // Find the hidden input WITHIN this specific dropdown div
+                const hiddenInput = dropdown.querySelector('input[type="hidden"]');
+
+                // Find the shared form
+                const parentForm = dropdown.closest('form');
+
+                // Toggle dropdown open/close
+                trigger.addEventListener('click', function(e) {
+                    e.stopPropagation();
+
+                    // Close other dropdowns first
+                    allDropdowns.forEach(other => {
+                        if (other !== dropdown) other.classList.remove('is-open');
+                    });
+
+                    dropdown.classList.toggle('is-open');
+                });
+
+                // Handle item selection
+                menuItems.forEach(item => {
+                    item.addEventListener('click', function() {
+                        const val = this.getAttribute('data-value');
+                        const text = this.innerText;
+
+                        // 1. Update the hidden input value
+                        if (hiddenInput) {
+                            hiddenInput.value = val;
+                        }
+
+                        // 2. Update the visible text
+                        displaySpan.innerText = text;
+
+                        // 3. Close the menu
+                        dropdown.classList.remove('is-open');
+
+                        // 4. Submit the shared form (this sends year, month, and day)
+                        if (parentForm) {
+                            parentForm.submit();
+                        }
+                    });
+                });
+            });
+
+            // Close all dropdowns if clicking anywhere else on the screen
+            window.addEventListener('click', () => {
+                allDropdowns.forEach(d => d.classList.remove('is-open'));
+            });
+        });
+    </script>
 
 </head>
 
@@ -208,12 +309,13 @@ $month = mysqli_fetch_assoc(mysqli_query($conn, $month_sql));
                     <!-- TOP HEADER -->
                     <div class="section-head">
                         <h2>TOTAL REVENUE</h2>
+                        <div class="filter-container">
+                            <form method="GET" id="filterForm" action="profit_status.php" class="filter-group">
 
-                        <div class="year-selector">
-                            <form method="GET" id="yearForm" action="profit_status.php">
+                                <!-- Year Selector -->
                                 <div class="modern-dropdown" id="yearDropdown">
                                     <div class="dropdown-trigger">
-                                        <span id="yearDisplay">
+                                        <span>
                                             <?php
                                             $currentY = (int) date('Y');
                                             $selectedY = isset($_GET['year']) ? intval($_GET['year']) : $currentY;
@@ -222,24 +324,45 @@ $month = mysqli_fetch_assoc(mysqli_query($conn, $month_sql));
                                         </span>
                                         <i class="fas fa-chevron-down"></i>
                                     </div>
-
                                     <ul class="dropdown-menu">
                                         <?php
+                                        // Generates current year and the 2 previous years
                                         for ($i = $currentY; $i >= ($currentY - 2); $i--) {
                                             $activeClass = ($i == $selectedY) ? 'active' : '';
                                             echo "<li data-value='$i' class='$activeClass'>$i</li>";
                                         }
                                         ?>
                                     </ul>
-
-                                    <input type="hidden" name="year" id="realYearInput" value="<?php echo $selectedY; ?>">
+                                    <input type="hidden" name="year" value="<?php echo $selectedY; ?>">
                                 </div>
+
+                                <!-- Month Selector -->
+                                <div class="modern-dropdown" id="monthDropdown">
+                                    <div class="dropdown-trigger">
+                                        <span>
+                                            <?php
+                                            $months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+                                            $selectedM = isset($_GET['month']) ? (int)$_GET['month'] : (int)date('n');
+                                            echo $months[$selectedM - 1];
+                                            ?>
+                                        </span>
+                                        <i class="fas fa-chevron-down"></i>
+                                    </div>
+                                    <ul class="dropdown-menu">
+                                        <?php foreach ($months as $index => $name): ?>
+                                            <?php $mVal = $index + 1; ?>
+                                            <li data-value="<?php echo $mVal; ?>" class="<?php echo ($mVal == $selectedM) ? 'active' : ''; ?>">
+                                                <?php echo $name; ?>
+                                            </li>
+                                        <?php endforeach; ?>
+                                    </ul>
+                                    <input type="hidden" name="month" value="<?php echo $selectedM; ?>">
+                                </div>
+
                             </form>
                         </div>
 
-
                     </div>
-
 
                     <!-- REVENUE CARDS -->
                     <div class="card-row">
