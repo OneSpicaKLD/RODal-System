@@ -278,7 +278,7 @@ while ($cat = mysqli_fetch_assoc($cat_result_modal)) {
                             $url_params .= '&category=' . urlencode($category);
                         if ($sort !== 'default')
                             $url_params .= '&sort=' . urlencode($sort); // <--- ADD THIS
-                        
+
                         ?>
                         <div class="pagination">
                             <?php if ($page > 1): ?>
@@ -406,7 +406,7 @@ while ($cat = mysqli_fetch_assoc($cat_result_modal)) {
                             $stock = $row['total_in'] - $row['total_out'];
                             $sold = $row['total_out'];
                             $catAttr = strtoupper(str_replace(' ', '_', $row['category_name']));
-                            ?>
+                        ?>
                             <tr data-category="<?php echo $catAttr; ?>">
                                 <td><?php echo htmlspecialchars($row['product_name']); ?></td>
                                 <td><?php echo ucwords(strtolower(str_replace('_', ' ', $row['category_name']))); ?></td>
@@ -493,18 +493,29 @@ while ($cat = mysqli_fetch_assoc($cat_result_modal)) {
                             <label for="new_sku">SKU <span class="required">*</span></label>
                             <input type="text" id="new_sku" name="product_sku" placeholder="e.g. SKU-00123" required>
                         </div>
+
                         <div class="form-group">
-                            <label for="new_category">Category <span class="required">*</span></label>
-                            <select id="new_category" name="category_id" required>
-                                <option value="">-- Select Category --</option>
-                                <?php
-                                foreach ($categories_for_modal as $cat) {
-                                    $readable = ucwords(strtolower(str_replace('_', ' ', $cat['category_name'])));
-                                    echo "<option value='{$cat['category_id']}'>$readable</option>";
-                                }
-                                ?>
-                            </select>
+                            <label>Category <span class="required">*</span></label>
+                            <div class="custom-dropdown-container">
+                                <button type="button" class="dropdown-trigger" id="dropdownBtn"
+                                    onclick="document.getElementById('category-list').classList.toggle('show'); event.stopPropagation();">
+                                    <span id="selected-label">-- Select Category --</span>
+                                    <span class="arrow" style="font-size: 10px; color: #999;">▼</span>
+                                </button>
+
+                                <ul class="dropdown-menu" id="category-list">
+                                    <?php foreach ($categories_for_modal as $cat):
+                                        $readable = ucwords(strtolower(str_replace('_', ' ', $cat['category_name']))); ?>
+                                        <li class="dropdown-item"
+                                            onclick="selectCategory('<?= $cat['category_id'] ?>', '<?= addslashes($readable) ?>')">
+                                            <?= $readable ?>
+                                        </li>
+                                    <?php endforeach; ?>
+                                </ul>
+                                <input type="hidden" id="new_category" name="category_id" required>
+                            </div>
                         </div>
+
                     </div>
                     <div class="form-row">
                         <div class="form-group">

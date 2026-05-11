@@ -2079,3 +2079,82 @@
         z-index: 1001 !important;
         /* Siguraduhin na mas mababa ito sa 100000 */
     }
+
+
+
+    /* Inline CSS for the Dropdown */
+    .custom-dropdown-container {
+        position: relative;
+        width: 100%;
+    }
+
+    .dropdown-trigger {
+        width: 100%;
+        height: 42px;
+        padding: 0 15px;
+        background: #fff;
+        border: 1px solid #e2e2e2;
+        border-radius: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+        font-size: 14px;
+        color: #666;
+        outline: none;
+    }
+
+    .dropdown-menu {
+        display: none;
+        position: absolute;
+        top: 105%;
+        left: 0;
+        width: 100%;
+        background: #fff;
+        border: 1px solid #e2e2e2;
+        border-radius: 10px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+        z-index: 9999;
+        padding: 5px 0;
+        margin: 0;
+        list-style: none;
+        max-height: 180px;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    .dropdown-menu.show {
+        display: block;
+    }
+
+    .dropdown-item {
+        padding: 10px 15px;
+        cursor: pointer;
+        font-size: 14px;
+        color: #444;
+        text-align: left;
+    }
+
+    .dropdown-item:hover {
+        background-color: #fff9e6;
+        color: #f1c40f;
+    }
+
+    /* Scrollbar Styling */
+    .dropdown-menu::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .dropdown-menu::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+    }
+
+    .dropdown-menu::-webkit-scrollbar-thumb {
+        background: #ccc;
+        border-radius: 10px;
+    }
+
+    .dropdown-menu::-webkit-scrollbar-thumb:hover {
+        background: #f1c40f;
+    }

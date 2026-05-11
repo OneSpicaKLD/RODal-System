@@ -778,3 +778,15 @@ function restoreProduct(productId, productName) {
             }));
     });
 }
+
+function selectCategory(id, text) {
+    document.getElementById('selected-label').innerText = text;
+    document.getElementById('new_category').value = id;
+    document.getElementById('category-list').classList.remove('show');
+}
+// Close menu when clicking outside
+window.addEventListener('click', function (e) {
+    if (!e.target.closest('.custom-dropdown-container')) {
+        document.getElementById('category-list').classList.remove('show');
+    }
+});
