@@ -167,6 +167,27 @@ $result = mysqli_query($conn, $sql);
                                     </span>
                                 </div>
 
+                                <a href="change_password.php"
+                                    style="display: flex !important; 
+                                align-items: center !important; 
+                                gap: 10px !important; 
+                                padding: 12px 18px !important; 
+                                text-decoration: none !important; 
+                                color: #333 !important; 
+                                font-weight: 600 !important;
+                                background: #fff !important;
+                                font-size: 14px !important;
+                                justify-content: flex-start !important;
+                                width: 100% !important;
+                                white-space: nowrap !important;
+                                border-bottom: 1px solid #f0f0f0 !important;
+                                transition: background 0.2s;"
+                                    onmouseover="this.style.backgroundColor='#fffdf0'"
+                                    onmouseout="this.style.backgroundColor='#ffffff'">
+                                    <i class="fas fa-key" style="color: #f1c40f;"></i> Change Password
+                                </a>
+
+
                                 <a href="logout.php" onclick="confirmLogout(event)" style="display: flex !important; 
                   align-items: center !important; 
                   gap: 10px !important; 
@@ -184,30 +205,6 @@ $result = mysqli_query($conn, $sql);
                                 </a>
                             </div>
                         </div>
-
-                        <script>
-                            function toggleProfileMenu(event) {
-                                event.stopPropagation();
-                                var menu = document.getElementById("profileDropdown");
-                                menu.style.display = (menu.style.display === "none" || menu.style.display === "") ? "block" : "none";
-                            }
-
-                            window.addEventListener('click', function (e) {
-                                var menu = document.getElementById("profileDropdown");
-                                var btn = document.getElementById("profileBtn");
-                                if (menu && menu.style.display === "block") {
-                                    if (!menu.contains(e.target) && !btn.contains(e.target)) {
-                                        menu.style.display = "none";
-                                    }
-                                }
-                            });
-
-                            window.addEventListener('keydown', function (e) {
-                                if (e.key === "Escape") {
-                                    document.getElementById("profileDropdown").style.display = "none";
-                                }
-                            });
-                        </script>
 
 
                     </div>
@@ -370,7 +367,7 @@ $result = mysqli_query($conn, $sql);
                                 $transaction_id = $row['transaction_id'];
 
                                 $subtotal = $row['price'] * $row['quantity'];
-                                ?>
+                        ?>
                                 <?php
                                 // 1. Logic for Type Badge (PLACE THIS RIGHT BEFORE YOUR <tr>)
                                 $type = $row['transaction_type'];
@@ -437,7 +434,7 @@ $result = mysqli_query($conn, $sql);
                                     </td>
                                 </tr>
 
-                                <?php
+                        <?php
                             }
                         } else {
                             echo "<tr><td colspan='8' style='text-align:center;'>No transactions found.</td></tr>";
@@ -448,13 +445,10 @@ $result = mysqli_query($conn, $sql);
                 </table>
             </div>
 
-            <style>
-
-            </style>
 
             <script>
                 document.querySelectorAll(".delete-btn").forEach(button => {
-                    button.addEventListener("click", function () {
+                    button.addEventListener("click", function() {
                         const transactionId = this.getAttribute('data-id'); // Kunin ang ID mula sa button
                         const row = this.closest("tr"); // Kunin ang table row para matanggal mamaya
 

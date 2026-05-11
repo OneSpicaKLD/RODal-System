@@ -1,3 +1,20 @@
+/* 
+   RODAL SYSTEM - SWEETALERT UX CONFIG
+   Ino-overwrite nito lahat ng Swal calls para maging uniform ang design.
+*/
+const RodalSwal = Swal.mixin({
+    customClass: {
+        popup: 'rodal-swal-popup',
+        confirmButton: 'rodal-swal-confirm',
+        cancelButton: 'rodal-swal-cancel',
+        title: 'rodal-swal-title'
+    },
+    buttonsStyling: false // Disable default styles para sumunod sa CSS natin
+});
+
+// Ito ang pinaka-importante: Ino-overwrite ang window.Swal object
+window.Swal = RodalSwal;
+
 let mySalesChart;
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -301,6 +318,10 @@ function confirmLogout(event) {
     // 1. Pigilan ang default na pag-click (hindi muna pupunta sa logout.php)
     event.preventDefault();
 
+    const dropdown = document.getElementById("profileDropdown");
+    if (dropdown) {
+        dropdown.style.display = "none";
+    }
     // 2. Kunin ang URL mula sa href attribute
     const url = event.currentTarget.getAttribute('href');
 
@@ -597,5 +618,148 @@ function archiveProduct(productId, productName) {
                 }
             })
             .catch(() => Swal.fire({ icon: 'error', title: 'Request Failed', text: 'Could not reach the server.' }));
+    });
+}
+
+function toggleProfileMenu(event) {
+    event.stopPropagation();
+    var menu = document.getElementById("profileDropdown");
+    menu.style.display = (menu.style.display === "none" || menu.style.display === "") ? "block" : "none";
+}
+
+window.addEventListener('click', function (e) {
+    var menu = document.getElementById("profileDropdown");
+    var btn = document.getElementById("profileBtn");
+    if (menu && menu.style.display === "block") {
+        if (!menu.contains(e.target) && !btn.contains(e.target)) {
+            menu.style.display = "none";
+        }
+    }
+});
+
+window.addEventListener('keydown', function (e) {
+    if (e.key === "Escape") {
+        document.getElementById("profileDropdown").style.display = "none";
+    }
+});
+
+function toggleMenu(event, id) {
+    event.stopPropagation(); // Prevents the window click listener from firing
+
+    const menuId = 'menu-' + id;
+    const allMenus = document.querySelectorAll('.dropdown-menu');
+
+    allMenus.forEach(menu => {
+        if (menu.id === menuId) {
+            menu.classList.toggle('show');
+        } else {
+            menu.classList.remove('show'); // Close other open menus
+        }
+    });
+}
+
+// Close the menu if you click anywhere else on the screen
+window.onclick = function () {
+    document.querySelectorAll('.dropdown-menu').forEach(menu => {
+        menu.classList.remove('show');
+    });
+};
+
+document.addEventListener('DOMContentLoaded', function () {
+    // Select all modern dropdowns on the page
+    const allDropdowns = document.querySelectorAll('.modern-dropdown');
+
+    allDropdowns.forEach(dropdown => {
+        const trigger = dropdown.querySelector('.dropdown-trigger');
+        const menuItems = dropdown.querySelectorAll('.dropdown-menu li');
+        const hiddenInput = dropdown.querySelector('input[type="hidden"]');
+        const displaySpan = trigger.querySelector('span');
+        const parentForm = dropdown.closest('form');
+
+        // Toggle Open/Close
+        trigger.addEventListener('click', function (e) {
+            e.stopPropagation();
+            // Close other dropdowns first
+            allDropdowns.forEach(other => {
+                if (other !== dropdown) other.classList.remove('is-open');
+            });
+            dropdown.classList.toggle('is-open');
+        });
+
+        // Selection Logic
+        menuItems.forEach(item => {
+            item.addEventListener('click', function () {
+                const val = this.getAttribute('data-value');
+                const text = this.innerText;
+
+                // Update UI
+                hiddenInput.value = val;
+                displaySpan.innerText = text;
+
+                // Close and handle actions
+                dropdown.classList.remove('is-open');
+
+                // If it's a form-based dropdown (like Year), submit it
+                if (parentForm) {
+                    parentForm.submit();
+                }
+
+                // If you have the filterCategory function active on this page, run it
+                if (typeof filterCategory === "function") {
+                    filterCategory();
+                }
+            });
+        });
+    });
+
+    // Close all if clicking anywhere else
+    window.addEventListener('click', () => {
+        allDropdowns.forEach(d => d.classList.remove('is-open'));
+    });
+});
+
+
+function restoreProduct(productId, productName) {
+    Swal.fire({
+        title: 'Restore "' + productName + '"?',
+        text: 'This product will be moved back to the active inventory.',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#2e7d32',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: '<i class="fas fa-undo"></i> Yes, Restore It',
+        cancelButtonText: 'Cancel'
+    }).then(result => {
+        if (!result.isConfirmed) return;
+
+        const data = new FormData();
+        data.append('product_id', productId);
+
+        fetch('restore_product.php', {
+            method: 'POST',
+            body: data
+        })
+            .then(res => res.text())
+            .then(response => {
+                if (response.trim() === 'success') {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Restored!',
+                        text: '"' + productName + '" is now active again.',
+                        confirmButtonColor: '#2e7d32'
+                    }).then(() => location.reload());
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: response
+                    });
+                }
+            })
+            .catch(() => Swal.fire({
+                icon: 'error',
+                title: 'Request Failed',
+                text: 'Could not reach the server.'
+            }));
     });
 }

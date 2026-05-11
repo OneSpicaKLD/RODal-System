@@ -304,7 +304,7 @@
         position: relative;
     }
 
-  
+
     .dropdown-menu.active {
         display: block;
         /* Shows when button is clicked */
@@ -1974,4 +1974,77 @@
         color: #dc3545;
         background-color: #fff5f5;
     }
-    
+
+    /* --- RODAL STORE CUSTOM SWEETALERT THEME --- */
+
+    /* Ang main box ng Alert */
+    .rodal-swal-popup {
+        background-color: #fdfdfd !important;
+        /* Almost white with a hint of warmth */
+        border-radius: 20px !important;
+        font-family: 'Poppins', sans-serif !important;
+        border: 0.5px solid #f1c40f !important;
+        /* Yellow border base sa chart mo */
+        padding: 2rem !important;
+    }
+
+    /* Design ng Confirm Button (Process/Yes) */
+    .rodal-swal-confirm {
+        background-color: #f1c40f !important;
+        color: #000 !important;
+        font-weight: 600 !important;
+        border-radius: 12px !important;
+        padding: 12px 30px !important;
+        margin: 10px !important;
+        cursor: pointer;
+        border: none;
+        transition: 0.3s;
+    }
+
+    .rodal-swal-confirm:hover {
+        background-color: #d4ac0d !important;
+        /* Medyo dark yellow pag hinover */
+    }
+
+    /* Design ng Cancel Button (No/Cancel) */
+    .rodal-swal-cancel {
+        background-color: #ecf0f1 !important;
+        color: #7f8c8d !important;
+        font-weight: 600 !important;
+        border-radius: 12px !important;
+        padding: 12px 30px !important;
+        margin: 10px !important;
+        cursor: pointer;
+        border: none;
+    }
+
+    /* Customizing the Icons to match Yellow Theme */
+    .swal2-icon.swal2-success {
+        border-color: #f1c40f !important;
+        color: #f1c40f !important;
+    }
+
+    .swal2-icon.swal2-success [class^='swal2-success-line'] {
+        background-color: #f1c40f !important;
+    }
+
+    .swal2-icon.swal2-warning,
+    .swal2-icon.swal2-question {
+        border-color: #f1c40f !important;
+        color: #f1c40f !important;
+    }
+
+    .swal2-container {
+        z-index: 100000 !important;
+        /* Mas mataas dapat ito sa header mo */
+    }
+
+    header {
+        z-index: 1000 !important;
+        /* Babaan natin konti para matakpan ng Swal */
+    }
+
+    .search-bar {
+        z-index: 1001 !important;
+        /* Siguraduhin na mas mababa ito sa 100000 */
+    }

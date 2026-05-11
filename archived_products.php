@@ -157,6 +157,27 @@ $result = mysqli_query($conn, $sql);
                                     </span>
                                 </div>
 
+                                <a href="change_password.php"
+                                    style="display: flex !important; 
+                                align-items: center !important; 
+                                gap: 10px !important; 
+                                padding: 12px 18px !important; 
+                                text-decoration: none !important; 
+                                color: #333 !important; 
+                                font-weight: 600 !important;
+                                background: #fff !important;
+                                font-size: 14px !important;
+                                justify-content: flex-start !important;
+                                width: 100% !important;
+                                white-space: nowrap !important;
+                                border-bottom: 1px solid #f0f0f0 !important;
+                                transition: background 0.2s;"
+                                    onmouseover="this.style.backgroundColor='#fffdf0'"
+                                    onmouseout="this.style.backgroundColor='#ffffff'">
+                                    <i class="fas fa-key" style="color: #f1c40f;"></i> Change Password
+                                </a>
+
+
                                 <a href="logout.php"
                                     onclick="confirmLogout(event)"
                                     style="display: flex !important; 
@@ -178,29 +199,6 @@ $result = mysqli_query($conn, $sql);
                             </div>
                         </div>
 
-                        <script>
-                            function toggleProfileMenu(event) {
-                                event.stopPropagation();
-                                var menu = document.getElementById("profileDropdown");
-                                menu.style.display = (menu.style.display === "none" || menu.style.display === "") ? "block" : "none";
-                            }
-
-                            window.addEventListener('click', function(e) {
-                                var menu = document.getElementById("profileDropdown");
-                                var btn = document.getElementById("profileBtn");
-                                if (menu && menu.style.display === "block") {
-                                    if (!menu.contains(e.target) && !btn.contains(e.target)) {
-                                        menu.style.display = "none";
-                                    }
-                                }
-                            });
-
-                            window.addEventListener('keydown', function(e) {
-                                if (e.key === "Escape") {
-                                    document.getElementById("profileDropdown").style.display = "none";
-                                }
-                            });
-                        </script>
                     </div>
                 </div>
             </header>

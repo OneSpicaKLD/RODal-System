@@ -215,6 +215,26 @@ while ($cat = mysqli_fetch_assoc($cat_result_modal)) {
                                     </span>
                                 </div>
 
+                                <a href="change_password.php"
+                                    style="display: flex !important; 
+                                    align-items: center !important; 
+                                    gap: 10px !important; 
+                                    padding: 12px 18px !important; 
+                                    text-decoration: none !important; 
+                                    color: #333 !important; 
+                                    font-weight: 600 !important;
+                                    background: #fff !important;
+                                    font-size: 14px !important;
+                                    justify-content: flex-start !important;
+                                    width: 100% !important;
+                                    white-space: nowrap !important;
+                                    border-bottom: 1px solid #f0f0f0 !important;
+                                    transition: background 0.2s;"
+                                    onmouseover="this.style.backgroundColor='#fffdf0'"
+                                    onmouseout="this.style.backgroundColor='#ffffff'">
+                                    <i class="fas fa-key" style="color: #f1c40f;"></i> Change Password
+                                </a>
+
                                 <a href="logout.php" onclick="confirmLogout(event)" style="display: flex !important; 
                   align-items: center !important; 
                   gap: 10px !important; 
@@ -233,29 +253,6 @@ while ($cat = mysqli_fetch_assoc($cat_result_modal)) {
                             </div>
                         </div>
 
-                        <script>
-                            function toggleProfileMenu(event) {
-                                event.stopPropagation();
-                                var menu = document.getElementById("profileDropdown");
-                                menu.style.display = (menu.style.display === "none" || menu.style.display === "") ? "block" : "none";
-                            }
-
-                            window.addEventListener('click', function (e) {
-                                var menu = document.getElementById("profileDropdown");
-                                var btn = document.getElementById("profileBtn");
-                                if (menu && menu.style.display === "block") {
-                                    if (!menu.contains(e.target) && !btn.contains(e.target)) {
-                                        menu.style.display = "none";
-                                    }
-                                }
-                            });
-
-                            window.addEventListener('keydown', function (e) {
-                                if (e.key === "Escape") {
-                                    document.getElementById("profileDropdown").style.display = "none";
-                                }
-                            });
-                        </script>
                     </div>
                 </div>
             </header>
@@ -277,7 +274,7 @@ while ($cat = mysqli_fetch_assoc($cat_result_modal)) {
                             $url_params .= '&category=' . urlencode($category);
                         if ($sort !== 'default')
                             $url_params .= '&sort=' . urlencode($sort); // <--- ADD THIS
-                        
+
                         ?>
                         <div class="pagination">
                             <?php if ($page > 1): ?>
@@ -405,7 +402,7 @@ while ($cat = mysqli_fetch_assoc($cat_result_modal)) {
                             $stock = $row['total_in'] - $row['total_out'];
                             $sold = $row['total_out'];
                             $catAttr = strtoupper(str_replace(' ', '_', $row['category_name']));
-                            ?>
+                        ?>
                             <tr data-category="<?php echo $catAttr; ?>">
                                 <td><?php echo htmlspecialchars($row['product_name']); ?></td>
                                 <td><?php echo ucwords(strtolower(str_replace('_', ' ', $row['category_name']))); ?></td>
@@ -582,30 +579,6 @@ while ($cat = mysqli_fetch_assoc($cat_result_modal)) {
             </form>
         </div>
     </div>
-
-    <script>
-        function toggleMenu(event, id) {
-            event.stopPropagation(); // Prevents the window click listener from firing
-
-            const menuId = 'menu-' + id;
-            const allMenus = document.querySelectorAll('.dropdown-menu');
-
-            allMenus.forEach(menu => {
-                if (menu.id === menuId) {
-                    menu.classList.toggle('show');
-                } else {
-                    menu.classList.remove('show'); // Close other open menus
-                }
-            });
-        }
-
-        // Close the menu if you click anywhere else on the screen
-        window.onclick = function () {
-            document.querySelectorAll('.dropdown-menu').forEach(menu => {
-                menu.classList.remove('show');
-            });
-        };
-    </script>
 
 </body>
 

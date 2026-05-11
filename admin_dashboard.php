@@ -193,6 +193,24 @@ $result = mysqli_query($conn, $sql);
                                             </span>
                                         </div>
 
+                                        <a href="reset_password.php" style="display: flex !important; 
+                  align-items: center !important; 
+                  gap: 10px !important; 
+                  padding: 12px 18px !important; 
+                  text-decoration: none !important; 
+                  color: #333 !important; 
+                  font-weight: 600 !important;
+                  background: #fff !important;
+                  font-size: 14px !important;
+                  justify-content: flex-start !important;
+                  width: 100% !important;
+                  white-space: nowrap !important;
+                  border-bottom: 1px solid #f0f0f0 !important;
+                  transition: background 0.2s;" onmouseover="this.style.backgroundColor='#fffdf0'"
+                                            onmouseout="this.style.backgroundColor='#ffffff'">
+                                            <i class="fas fa-shield-alt" style="color: #f1c40f;"></i> Reset Password
+                                        </a>
+
                                         <a href="logout.php" onclick="confirmLogout(event)" style="display: flex !important; 
                   align-items: center !important; 
                   gap: 10px !important; 

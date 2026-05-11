@@ -154,6 +154,26 @@ $month = mysqli_fetch_assoc(mysqli_query($conn, $month_sql));
                                     </span>
                                 </div>
 
+                                <a href="change_password.php"
+                                    style="display: flex !important; 
+                                align-items: center !important; 
+                                gap: 10px !important; 
+                                padding: 12px 18px !important; 
+                                text-decoration: none !important; 
+                                color: #333 !important; 
+                                font-weight: 600 !important;
+                                background: #fff !important;
+                                font-size: 14px !important;
+                                justify-content: flex-start !important;
+                                width: 100% !important;
+                                white-space: nowrap !important;
+                                border-bottom: 1px solid #f0f0f0 !important;
+                                transition: background 0.2s;"
+                                    onmouseover="this.style.backgroundColor='#fffdf0'"
+                                    onmouseout="this.style.backgroundColor='#ffffff'">
+                                    <i class="fas fa-key" style="color: #f1c40f;"></i> Change Password
+                                </a>
+
                                 <a href="logout.php"
                                     onclick="confirmLogout(event)"
                                     style="display: flex !important; 
@@ -175,30 +195,7 @@ $month = mysqli_fetch_assoc(mysqli_query($conn, $month_sql));
                             </div>
                         </div>
 
-                        <script>
-                            function toggleProfileMenu(event) {
-                                event.stopPropagation();
-                                var menu = document.getElementById("profileDropdown");
-                                menu.style.display = (menu.style.display === "none" || menu.style.display === "") ? "block" : "none";
-                            }
 
-                            window.addEventListener('click', function(e) {
-                                var menu = document.getElementById("profileDropdown");
-                                var btn = document.getElementById("profileBtn");
-                                if (menu && menu.style.display === "block") {
-                                    if (!menu.contains(e.target) && !btn.contains(e.target)) {
-                                        menu.style.display = "none";
-                                    }
-                                }
-                            });
-
-                            window.addEventListener('keydown', function(e) {
-                                if (e.key === "Escape") {
-                                    document.getElementById("profileDropdown").style.display = "none";
-                                }
-                            });
-                        </script>
-                        
                     </div>
                 </div>
             </header>
@@ -407,62 +404,6 @@ $month = mysqli_fetch_assoc(mysqli_query($conn, $month_sql));
             display: block;
         }
     </style>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Select all modern dropdowns on the page
-            const allDropdowns = document.querySelectorAll('.modern-dropdown');
-
-            allDropdowns.forEach(dropdown => {
-                const trigger = dropdown.querySelector('.dropdown-trigger');
-                const menuItems = dropdown.querySelectorAll('.dropdown-menu li');
-                const hiddenInput = dropdown.querySelector('input[type="hidden"]');
-                const displaySpan = trigger.querySelector('span');
-                const parentForm = dropdown.closest('form');
-
-                // Toggle Open/Close
-                trigger.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    // Close other dropdowns first
-                    allDropdowns.forEach(other => {
-                        if (other !== dropdown) other.classList.remove('is-open');
-                    });
-                    dropdown.classList.toggle('is-open');
-                });
-
-                // Selection Logic
-                menuItems.forEach(item => {
-                    item.addEventListener('click', function() {
-                        const val = this.getAttribute('data-value');
-                        const text = this.innerText;
-
-                        // Update UI
-                        hiddenInput.value = val;
-                        displaySpan.innerText = text;
-
-                        // Close and handle actions
-                        dropdown.classList.remove('is-open');
-
-                        // If it's a form-based dropdown (like Year), submit it
-                        if (parentForm) {
-                            parentForm.submit();
-                        }
-
-                        // If you have the filterCategory function active on this page, run it
-                        if (typeof filterCategory === "function") {
-                            filterCategory();
-                        }
-                    });
-                });
-            });
-
-            // Close all if clicking anywhere else
-            window.addEventListener('click', () => {
-                allDropdowns.forEach(d => d.classList.remove('is-open'));
-            });
-        });
-    </script>
-
 
 </body>
 
