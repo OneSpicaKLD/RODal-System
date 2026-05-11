@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3307
--- Generation Time: May 11, 2026 at 03:17 PM
+-- Generation Time: May 11, 2026 at 07:04 PM
 -- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- PHP Version: 8.0.30
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -179,9 +179,10 @@ INSERT INTO `notification` (`id`, `product_id`, `transaction_id`, `title`, `mess
 (105, 1000, 54, 'Expiry Warning', 'Expiring soon: CREAM-O 3PCS [Batch #54] (1 units) on 2026-06-01', 'read', '2026-05-08 09:50:01'),
 (106, 1000, 56, 'Expiry Warning', 'Expiring soon: CREAM-O 3PCS [Batch #56] (1 units) on 2026-05-29', 'read', '2026-05-08 09:50:29'),
 (107, 1000, 42, 'Expiry Warning', 'Expiring soon: CREAM-O 3PCS [Batch #42] (1 units) on 2026-06-08', 'read', '2026-05-09 05:55:04'),
-(108, 1007, 58, 'Low Stock', 'SKYFLAKES CRACKERS 3PCS is running low (3 left).', 'unread', '2026-05-10 16:38:44'),
-(109, 1007, 59, 'Low Stock', 'SKYFLAKES CRACKERS 3PCS is running low (2 left).', 'unread', '2026-05-10 16:39:12'),
-(110, 1007, 60, 'Low Stock', 'SKYFLAKES CRACKERS 3PCS is running low (3 left).', 'unread', '2026-05-11 08:31:29');
+(108, 1007, 58, 'Low Stock', 'SKYFLAKES CRACKERS 3PCS is running low (3 left).', 'read', '2026-05-10 16:38:44'),
+(109, 1007, 59, 'Low Stock', 'SKYFLAKES CRACKERS 3PCS is running low (2 left).', 'read', '2026-05-10 16:39:12'),
+(110, 1007, 60, 'Low Stock', 'SKYFLAKES CRACKERS 3PCS is running low (3 left).', 'read', '2026-05-11 08:31:29'),
+(175, 1005, 17, 'Expiry Warning', 'Expiring soon: REBISCO CRACKERS 4PCS [Batch #17] (2 units) on 2026-06-11', 'read', '2026-05-11 16:42:28');
 
 -- --------------------------------------------------------
 
@@ -442,16 +443,17 @@ CREATE TABLE `user` (
   `username` varchar(50) NOT NULL,
   `password` varchar(250) NOT NULL,
   `role` varchar(20) DEFAULT 'admin',
-  `email` varchar(100) NOT NULL
+  `email` varchar(100) NOT NULL,
+  `reset_token` varchar(255) DEFAULT NULL,
+  `token_expire` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `user`
 --
 
-INSERT INTO `user` (`user_id`, `username`, `password`, `role`, `email`) VALUES
-(1, 'RODal', '$2y$10$lYPHm8i61lVs6iaVLbVZ..XDqlK8Xd4SRkpLcjtHiEDk0ZULQgmDS', 'owner', ''),
-(2, 'SysAdmin', '$2y$10$CL.I.q1DBpoxgvzjkEgLpu4l67KodIizGjgDtvJ1JQOaNSZb.eGZq', 'admin', '');
+INSERT INTO `user` (`user_id`, `username`, `password`, `role`, `email`, `reset_token`, `token_expire`) VALUES
+(1, 'RODal', '$2y$10$pg3i6ymMctnwjkK9BbTduOUi4MnpHPAzk1FlTkUQg08n10Uw3rdv2', 'owner', 'haroldsilguera497@gmail.com', NULL, NULL);
 
 --
 -- Indexes for dumped tables
@@ -490,7 +492,10 @@ ALTER TABLE `stock_transaction`
 -- Indexes for table `user`
 --
 ALTER TABLE `user`
-  ADD PRIMARY KEY (`user_id`);
+  ADD PRIMARY KEY (`user_id`),
+  ADD UNIQUE KEY `username` (`username`),
+  ADD UNIQUE KEY `username_2` (`username`),
+  ADD UNIQUE KEY `username_3` (`username`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -506,7 +511,7 @@ ALTER TABLE `category`
 -- AUTO_INCREMENT for table `notification`
 --
 ALTER TABLE `notification`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=175;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=176;
 
 --
 -- AUTO_INCREMENT for table `product`
@@ -524,7 +529,7 @@ ALTER TABLE `stock_transaction`
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- Constraints for dumped tables
