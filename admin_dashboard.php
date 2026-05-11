@@ -32,7 +32,7 @@ switch ($sort) {
         $orderBy = "st.transaction_type DESC, st.transaction_date DESC";
         break;
     case 'newest':
-        default:
+    default:
         $orderBy = "st.transaction_id DESC";
         break;
 }
@@ -69,15 +69,15 @@ $sql = "SELECT
             st.transaction_type, 
             st.quantity, 
             st.related_tid,
-            st.buy_amount,  -- Historical cost at time of restock
-            st.sell_amount, -- Historical price at time of sale
+            st.buy_amount,  -- This is the bulk cost logged at the time
+            st.sell_amount, -- This is the bulk price logged at the time
             p.product_name, 
             c.category_name
         FROM stock_transaction st
         JOIN product p ON st.product_id = p.product_id
         JOIN category c ON p.category_id = c.category_id
         $whereClause
-        ORDER BY $orderBy
+        ORDER BY $orderBy 
         LIMIT $limit OFFSET $offset";
 
 $result = mysqli_query($conn, $sql);
@@ -454,19 +454,36 @@ $result = mysqli_query($conn, $sql);
                                 while ($row = $result->fetch_assoc()) {
                                     $transaction_id = $row['transaction_id'];
                                     $type = $row['transaction_type'];
-                                    $qty = abs($row['quantity']); // Use absolute value for the division
-                        
-                                    // 1. Identify the TOTAL amount from the DB
-                                    $totalAmount = ($type === 'IN') ? $row['buy_amount'] : $row['sell_amount'];
 
-                                    // 2. CALCULATE UNIT PRICE (Total / Quantity)
-                                    $unitPrice = ($qty > 0) ? ($totalAmount / $qty) : 0;
+                                    // 1. Handle Quantity: Use absolute for math, keep original for the table display
+                                    $qty_display = $row['quantity'];
+                                    $qty_math = abs($qty_display);
 
-                                    // 3. SUBTOTAL is the total amount itself
+                                    // 2. SMART TOTAL DETECTION
+                                    if ($type === 'IN') {
+                                        $totalAmount = $row['buy_amount'];
+                                    } elseif ($type === 'OUT') {
+                                        $totalAmount = $row['sell_amount'];
+                                    } else {
+                                        // ADJUSTMENT logic: 
+                                        // We check which column actually contains the mirrored value.
+                                        // If buy_amount is NOT zero, it was a Restock adjustment.
+                                        // If sell_amount is NOT zero, it was a Sale adjustment.
+                                        if (abs($row['buy_amount']) > 0) {
+                                            $totalAmount = $row['buy_amount'];
+                                        } else {
+                                            $totalAmount = $row['sell_amount'];
+                                        }
+                                    }
+
+                                    // 3. CALCULATE UNIT PRICE
+                                    // Total divided by Absolute Quantity = Original Unit Price
+                                    $unitPrice = ($qty_math > 0) ? ($totalAmount / $qty_math) : 0;
+
+                                    // 4. SUBTOTAL is simply the total value from the DB
                                     $subtotal = $totalAmount;
 
-                                    // --- Badge Logic follows below ---
-                                    // --- Badge Logic ---
+                                    // 5. Badge Logic
                                     if ($type === 'ADJUSTMENT') {
                                         $typeLabel = 'Adjustment';
                                         $typeColor = '#7f8c8d';
@@ -476,6 +493,8 @@ $result = mysqli_query($conn, $sql);
                                         $typeColor = $isRestock ? '#3498db' : '#2e7d32';
                                     }
                                     ?>
+
+
                                     <tr>
                                         <td style="color: #666; font-size: 0.9rem;">
                                             <?php echo date('M d, Y h:i A', strtotime($row['transaction_date'])); ?>

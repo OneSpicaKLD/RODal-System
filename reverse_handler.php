@@ -13,31 +13,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $p_id = $orig['product_id'];
         $type = $orig['transaction_type'];
         $neg_qty = $orig['quantity'] * -1;
-        $neg_buy = $orig['buy_amount'] * -1;
-        $neg_sell = $orig['sell_amount'] * -1;
+        $target_id = $transaction_id;
 
-        // 2. Insert the Adjustment
-        $insert = "INSERT INTO stock_transaction 
+        if ($type === "IN") {
+            // It was a RESTOCK: Use the buy_amount, FORCE sell_amount to 0 to stop the trigger
+            $val_buy = (float) $orig['buy_amount'] * -1;
+            $insert = "INSERT INTO stock_transaction 
                    (product_id, transaction_type, quantity, buy_amount, sell_amount, transaction_date, related_tid) 
-                   VALUES ($p_id, 'ADJUSTMENT', $neg_qty, $neg_buy, $neg_sell, NOW(), $transaction_id)";
-
-        if (mysqli_query($conn, $insert)) {
-            // 3. Get the ID of the new adjustment we just made
-            $new_id = mysqli_insert_id($conn);
-
-            // 4. Update the ORIGINAL row (Using $transaction_id, not $tid)
-            $update_orig = "UPDATE stock_transaction SET related_tid = $new_id WHERE transaction_id = $transaction_id";
-
-            if (mysqli_query($conn, $update_orig)) {
-                echo "success";
-            } else {
-                echo "Update Error: " . mysqli_error($conn);
-            }
-        } else {
-            echo "Insert Error: " . mysqli_error($conn);
+                   VALUES ($p_id, 'ADJUSTMENT', $neg_qty, $val_buy, 0, NOW(), $target_id)";
+        } elseif ($type === "OUT") {
+            // It was a SALE: Use the sell_amount, FORCE buy_amount to 0 to stop the trigger
+            $val_sell = (float) $orig['sell_amount'] * -1;
+            $insert = "INSERT INTO stock_transaction 
+                   (product_id, transaction_type, quantity, buy_amount, sell_amount, transaction_date, related_tid) 
+                   VALUES ($p_id, 'ADJUSTMENT', $neg_qty, 0, $val_sell, NOW(), $target_id)";
         }
-    } else {
-        echo "Transaction not found.";
+
+
+        // Run the specific query built above
+        if (isset($insert) && mysqli_query($conn, $insert)) {
+            $new_id = mysqli_insert_id($conn);
+            mysqli_query($conn, "UPDATE stock_transaction SET related_tid = $new_id WHERE transaction_id = $target_id");
+            echo "success";
+        }
     }
+
 }
 ?>

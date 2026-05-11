@@ -1,6 +1,7 @@
 <?php
 session_start();
 
+// 1. Security Check
 if (!isset($_SESSION['isLoggedIn'])) {
     header("Location: index.php");
     exit();
@@ -8,51 +9,48 @@ if (!isset($_SESSION['isLoggedIn'])) {
 
 require 'db_connect.php';
 
-// 1. Capture All Filters
+// 2. Capture and Sanitize All Filters
 $search = isset($_GET['search']) ? mysqli_real_escape_string($conn, trim($_GET['search'])) : '';
-$category = (isset($_GET['category']) && $_GET['category'] !== 'all') ? mysqli_real_escape_string($conn, $_GET['category']) : '';
-$sort = $_GET['sort'] ?? 'newest'; // Capture the sort parameter
+$category = (isset($_GET['category']) && $_GET['category'] !== 'all') ? mysqli_real_escape_string($conn, $_GET['category']) : 'all';
+$sort = $_GET['sort'] ?? 'newest';
 
-// 2. Define Sorting Logic (THIS FIXES THE FATAL ERROR)
+// 3. Define Audit-Proof Sorting Logic
+// We use CASE to pick the total cash value actually logged in the transaction
 switch ($sort) {
     case 'oldest':
         $orderBy = "st.transaction_id ASC";
         break;
     case 'highest_val':
-        // Sort by the TOTAL cash value (not the unit price)
         $orderBy = "(CASE WHEN st.transaction_type = 'IN' THEN st.buy_amount ELSE st.sell_amount END) DESC";
         break;
     case 'lowest_val':
-        // This will put the ₱0.00 and ₱8.00 transactions at the very top
         $orderBy = "(CASE WHEN st.transaction_type = 'IN' THEN st.buy_amount ELSE st.sell_amount END) ASC";
         break;
     case 'type':
         $orderBy = "st.transaction_type DESC, st.transaction_date DESC";
         break;
-
+    case 'newest':
     default:
         $orderBy = "st.transaction_id DESC";
 }
 
-
-// 3. Setup Pagination Variables
+// 4. Setup Pagination Variables
 $limit = 10;
 $page = isset($_GET['page']) ? max(1, (int) $_GET['page']) : 1;
 $offset = ($page - 1) * $limit;
 
-// 4. Build Dynamic WHERE Clause
+// 5. Build Dynamic WHERE Clause
 $conditions = [];
 if (!empty($search)) {
     $conditions[] = "p.product_name LIKE '%$search%'";
 }
-
-if (!empty($category)) {
+if ($category !== 'all' && !empty($category)) {
     $conditions[] = "c.category_name = '$category'";
 }
 
 $whereClause = !empty($conditions) ? "WHERE " . implode(" AND ", $conditions) : "";
 
-// 5. Get Total Count
+// 6. Get Total Count for Pagination
 $total_query = "SELECT COUNT(*) as total 
                 FROM stock_transaction st
                 JOIN product p ON st.product_id = p.product_id
@@ -63,15 +61,16 @@ $total_row = mysqli_fetch_assoc($total_results_res);
 $total_rows = $total_row['total'] ?? 0;
 $total_pages = ceil($total_rows / $limit);
 
-// 6. Main Transaction Query
+// 7. Main Audit-Proof Transaction Query
+// We select buy_amount and sell_amount to ensure we show what happened HISTORICALLY
 $sql = "SELECT 
             st.transaction_id, 
             st.transaction_date, 
             st.transaction_type, 
             st.quantity, 
             st.related_tid,
-            st.buy_amount,
-            st.sell_amount,
+            st.buy_amount,  -- This is the bulk cost logged at the time
+            st.sell_amount, -- This is the bulk price logged at the time
             p.product_name, 
             c.category_name
         FROM stock_transaction st
@@ -83,6 +82,7 @@ $sql = "SELECT
 
 $result = mysqli_query($conn, $sql);
 ?>
+
 
 
 <!DOCTYPE html>
@@ -366,19 +366,36 @@ $result = mysqli_query($conn, $sql);
                                 $transaction_id = $row['transaction_id'];
                                 $type = $row['transaction_type'];
 
-                                // 1. Get the absolute quantity to avoid math errors with negative adjustments
-                                $qty = abs($row['quantity']);
+                                // 1. Handle Quantity: Use absolute for math, keep original for the table display
+                                $qty_display = $row['quantity'];
+                                $qty_math = abs($qty_display);
 
-                                // 2. Identify which total amount to use
-                                $totalAmount = ($type === 'IN') ? $row['buy_amount'] : $row['sell_amount'];
+                                // 2. SMART TOTAL DETECTION
+                                if ($type === 'IN') {
+                                    $totalAmount = $row['buy_amount'];
+                                } elseif ($type === 'OUT') {
+                                    $totalAmount = $row['sell_amount'];
+                                } else {
+                                    // ADJUSTMENT logic: 
+                                    // We check which column actually contains the mirrored value.
+                                    // If buy_amount is NOT zero, it was a Restock adjustment.
+                                    // If sell_amount is NOT zero, it was a Sale adjustment.
+                                    if (abs($row['buy_amount']) > 0) {
+                                        $totalAmount = $row['buy_amount'];
+                                    } else {
+                                        $totalAmount = $row['sell_amount'];
+                                    }
+                                }
 
-                                // 3. CALCULATE THE UNIT PRICE (Total / Quantity)
-                                // This turns ₱9,000.00 into ₱10.00 if the quantity is 900
-                                $unitPrice = ($qty > 0) ? ($totalAmount / $qty) : 0;
 
-                                // 4. The Subtotal is just the original amount from the database
+                                // 3. CALCULATE UNIT PRICE
+                                // Total divided by Absolute Quantity = Original Unit Price
+                                $unitPrice = ($qty_math > 0) ? ($totalAmount / $qty_math) : 0;
+
+                                // 4. SUBTOTAL is simply the total value from the DB
                                 $subtotal = $totalAmount;
-                                // 2. Badge Logic
+
+                                // 5. Badge Logic
                                 if ($type === 'ADJUSTMENT') {
                                     $typeLabel = 'Adjustment';
                                     $typeColor = '#7f8c8d';
@@ -388,6 +405,7 @@ $result = mysqli_query($conn, $sql);
                                     $typeColor = $isRestock ? '#3498db' : '#2e7d32';
                                 }
                                 ?>
+
                                 <tr>
                                     <!-- Date & Time -->
                                     <td style="color: #666; font-size: 0.9rem;">
