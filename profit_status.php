@@ -24,13 +24,11 @@ $currentM = (int) date('n');
 $selectedY = isset($_GET['year']) ? intval($_GET['year']) : $currentY;
 $selectedM = isset($_GET['month']) ? intval($_GET['month']) : $currentM;
 
-// 2. TODAY (Stays focused on the actual current date)
 $today_sql = "SELECT SUM(t.sell_amount) as rev, SUM(t.sell_amount - (p.cost * t.quantity)) as prof 
               FROM stock_transaction t JOIN product p ON t.product_id = p.product_id
               WHERE t.transaction_type = 'OUT' AND DATE(t.transaction_date) = CURDATE()";
 $today = mysqli_fetch_assoc(mysqli_query($conn, $today_sql));
 
-// 2. THIS WEEK (Syncs with your selected filters)
 $week_sql = "SELECT SUM(t.sell_amount) as rev, SUM(t.sell_amount - (p.cost * t.quantity)) as prof 
              FROM stock_transaction t JOIN product p ON t.product_id = p.product_id
              WHERE t.transaction_type = 'OUT' 
@@ -41,7 +39,6 @@ $week_sql = "SELECT SUM(t.sell_amount) as rev, SUM(t.sell_amount - (p.cost * t.q
 $week_res = mysqli_query($conn, $week_sql);
 $week = mysqli_fetch_assoc($week_res);
 
-// 3. SELECTED MONTH (Now follows your dropdown selection exactly)
 $month_sql = "SELECT 
                 SUM(t.sell_amount) as rev, 
                 SUM(t.sell_amount - (p.cost * t.quantity)) as prof 
@@ -54,8 +51,6 @@ $month_sql = "SELECT
 $month_res = mysqli_query($conn, $month_sql);
 $month = mysqli_fetch_assoc($month_res);
 
-
-// 4. SELECTED YEAR TOTAL (Added for your Year dropdown)
 $year_sql = "SELECT SUM(t.sell_amount) as rev, SUM(t.sell_amount - (p.cost * t.quantity)) as prof 
              FROM stock_transaction t JOIN product p ON t.product_id = p.product_id
              WHERE t.transaction_type = 'OUT' 
@@ -63,7 +58,6 @@ $year_sql = "SELECT SUM(t.sell_amount) as rev, SUM(t.sell_amount - (p.cost * t.q
 
 $year_data = mysqli_fetch_assoc(mysqli_query($conn, $year_sql));
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
