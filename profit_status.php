@@ -1,5 +1,4 @@
 <?php
-// ... session and db_connect lines ...
 session_start();
 
 if (!isset($_SESSION['isLoggedIn'])) {
@@ -9,55 +8,47 @@ if (!isset($_SESSION['isLoggedIn'])) {
 
 require 'db_connect.php';
 
-// Get all unique years from the database to populate the dropdown
-$year_list_sql = "SELECT DISTINCT YEAR(transaction_date) as year_val 
-                  FROM stock_transaction 
-                  ORDER BY year_val DESC";
-$year_list_res = mysqli_query($conn, $year_list_sql);
-
-
-
-// 1. Capture Year and Month from the URL (Syncs with your HTML form)
+// 1. Capture All Date Filters
 $currentY = (int) date('Y');
 $currentM = (int) date('n');
+$currentD = (int) date('j');
 
 $selectedY = isset($_GET['year']) ? intval($_GET['year']) : $currentY;
 $selectedM = isset($_GET['month']) ? intval($_GET['month']) : $currentM;
+$selectedD = isset($_GET['day']) ? intval($_GET['day']) : $currentD;
 
-$today_sql = "SELECT SUM(t.sell_amount) as rev, SUM(t.sell_amount - (p.cost * t.quantity)) as prof 
-              FROM stock_transaction t JOIN product p ON t.product_id = p.product_id
-              WHERE t.transaction_type = 'OUT' AND DATE(t.transaction_date) = CURDATE()";
-$today = mysqli_fetch_assoc(mysqli_query($conn, $today_sql));
+// 2. SELECTED DAY (Matches your Day Dropdown)
+$day_sql = "SELECT SUM(t.sell_amount) as rev, SUM(t.sell_amount - (p.cost * t.quantity)) as prof 
+            FROM stock_transaction t JOIN product p ON t.product_id = p.product_id
+            WHERE t.transaction_type = 'OUT' 
+            AND DAY(t.transaction_date) = $selectedD
+            AND MONTH(t.transaction_date) = $selectedM 
+            AND YEAR(t.transaction_date) = $selectedY";
+$day_data = mysqli_fetch_assoc(mysqli_query($conn, $day_sql));
 
+// 3. THIS WEEK (Actual last 7 days from today)
 $week_sql = "SELECT SUM(t.sell_amount) as rev, SUM(t.sell_amount - (p.cost * t.quantity)) as prof 
              FROM stock_transaction t JOIN product p ON t.product_id = p.product_id
              WHERE t.transaction_type = 'OUT' 
-             AND YEAR(t.transaction_date) = $selectedY
-             AND MONTH(t.transaction_date) = $selectedM
              AND t.transaction_date >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)";
+$week = mysqli_fetch_assoc(mysqli_query($conn, $week_sql));
 
-$week_res = mysqli_query($conn, $week_sql);
-$week = mysqli_fetch_assoc($week_res);
-
-$month_sql = "SELECT 
-                SUM(t.sell_amount) as rev, 
-                SUM(t.sell_amount - (p.cost * t.quantity)) as prof 
-              FROM stock_transaction t 
-              JOIN product p ON t.product_id = p.product_id
+// 4. SELECTED MONTH (Matches your Month Dropdown)
+$month_sql = "SELECT SUM(t.sell_amount) as rev, SUM(t.sell_amount - (p.cost * t.quantity)) as prof 
+              FROM stock_transaction t JOIN product p ON t.product_id = p.product_id
               WHERE t.transaction_type = 'OUT' 
               AND MONTH(t.transaction_date) = $selectedM 
               AND YEAR(t.transaction_date) = $selectedY";
+$month = mysqli_fetch_assoc(mysqli_query($conn, $month_sql));
 
-$month_res = mysqli_query($conn, $month_sql);
-$month = mysqli_fetch_assoc($month_res);
-
+// 5. SELECTED YEAR (Matches your Year Dropdown)
 $year_sql = "SELECT SUM(t.sell_amount) as rev, SUM(t.sell_amount - (p.cost * t.quantity)) as prof 
              FROM stock_transaction t JOIN product p ON t.product_id = p.product_id
              WHERE t.transaction_type = 'OUT' 
              AND YEAR(t.transaction_date) = $selectedY";
-
 $year_data = mysqli_fetch_assoc(mysqli_query($conn, $year_sql));
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -311,7 +302,6 @@ $year_data = mysqli_fetch_assoc(mysqli_query($conn, $year_sql));
                                 </a>
                             </div>
                         </div>
-
                     </div>
                 </div>
             </header>
@@ -375,6 +365,31 @@ $year_data = mysqli_fetch_assoc(mysqli_query($conn, $year_sql));
                                     <input type="hidden" name="month" value="<?php echo $selectedM; ?>">
                                 </div>
 
+                                <!-- Day Selector -->
+                                <div class="modern-dropdown" id="dayDropdown">
+                                    <div class="dropdown-trigger">
+                                        <span>
+                                            <?php
+                                            $selectedD = isset($_GET['day']) ? (int) $_GET['day'] : (int) date('j');
+                                            echo $selectedD;
+                                            ?>
+                                        </span>
+                                        <i class="fas fa-chevron-down"></i>
+                                    </div>
+                                    <ul class="dropdown-menu">
+                                        <?php
+                                        // Get number of days in the selected month/year
+                                        $daysInMonth = cal_days_in_month(CAL_GREGORIAN, $selectedM, $selectedY);
+                                        for ($d = 1; $d <= $daysInMonth; $d++):
+                                            $activeClass = ($d == $selectedD) ? 'active' : '';
+                                            echo "<li data-value='$d' class='$activeClass'>$d</li>";
+                                        endfor;
+                                        ?>
+                                    </ul>
+                                    <input type="hidden" name="day" value="<?php echo $selectedD; ?>">
+                                </div>
+
+
                             </form>
                         </div>
 
@@ -383,26 +398,23 @@ $year_data = mysqli_fetch_assoc(mysqli_query($conn, $year_sql));
                     <!-- REVENUE CARDS -->
                     <div class="card-row">
                         <div class="yellow-box">
-                            <span>TODAY</span>
-                            <strong>₱
-                                <?php echo number_format($today['rev'] ?? 0, 2); ?>
-                            </strong>
+                            <span>SELECTED DAY</span>
+                            <strong>₱<?php echo number_format($day_data['rev'] ?? 0, 2); ?></strong>
                         </div>
 
                         <div class="yellow-box">
                             <span>THIS WEEK</span>
-                            <strong>₱
-                                <?php echo number_format($week['rev'] ?? 0, 2); ?>
-                            </strong>
+                            <strong>₱<?php echo number_format($week['rev'] ?? 0, 2); ?></strong>
                         </div>
 
                         <div class="yellow-box">
-                            <span>THIS MONTH</span>
-                            <strong>₱
-                                <?php echo number_format($month['rev'] ?? 0, 2); ?>
-                            </strong>
+                            <span>SELECTED MONTH</span>
+                            <!-- Use $month instead of $month_data -->
+                            <strong>₱<?php echo number_format($month['rev'] ?? 0, 2); ?></strong>
                         </div>
                     </div>
+
+
 
 
                     <!-- SECOND TITLE -->
@@ -413,26 +425,23 @@ $year_data = mysqli_fetch_assoc(mysqli_query($conn, $year_sql));
                     <!-- PROFIT CARDS -->
                     <div class="card-row">
                         <div class="green-box">
-                            <span>TODAY</span>
-                            <strong>₱
-                                <?php echo number_format($today['prof'] ?? 0, 2); ?>
-                            </strong>
+                            <span>SELECTED DAY</span>
+                            <strong>₱<?php echo number_format($day_data['prof'] ?? 0, 2); ?></strong>
                         </div>
 
                         <div class="green-box">
                             <span>THIS WEEK</span>
-                            <strong>₱
-                                <?php echo number_format($week['prof'] ?? 0, 2); ?>
-                            </strong>
+                            <strong>₱<?php echo number_format($week['prof'] ?? 0, 2); ?></strong>
                         </div>
 
                         <div class="green-box">
-                            <span>THIS MONTH</span>
-                            <strong>₱
-                                <?php echo number_format($month['prof'] ?? 0, 2); ?>
-                            </strong>
+                            <span>SELECTED MONTH</span>
+                            <!-- Use $month instead of $month_data -->
+                            <strong>₱<?php echo number_format($month['prof'] ?? 0, 2); ?></strong>
                         </div>
                     </div>
+
+
 
                 </section>
 
