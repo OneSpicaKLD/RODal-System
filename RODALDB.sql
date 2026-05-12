@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3307
--- Generation Time: May 11, 2026 at 07:09 PM
+-- Generation Time: May 12, 2026 at 06:42 AM
 -- Server version: 10.4.32-MariaDB
--- PHP Version: 8.0.30
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -182,7 +182,11 @@ INSERT INTO `notification` (`id`, `product_id`, `transaction_id`, `title`, `mess
 (108, 1007, 58, 'Low Stock', 'SKYFLAKES CRACKERS 3PCS is running low (3 left).', 'read', '2026-05-10 16:38:44'),
 (109, 1007, 59, 'Low Stock', 'SKYFLAKES CRACKERS 3PCS is running low (2 left).', 'read', '2026-05-10 16:39:12'),
 (110, 1007, 60, 'Low Stock', 'SKYFLAKES CRACKERS 3PCS is running low (3 left).', 'read', '2026-05-11 08:31:29'),
-(175, 1005, 17, 'Expiry Warning', 'Expiring soon: REBISCO CRACKERS 4PCS [Batch #17] (2 units) on 2026-06-11', 'read', '2026-05-11 16:42:28');
+(175, 1005, 17, 'Expiry Warning', 'Expiring soon: REBISCO CRACKERS 4PCS [Batch #17] (2 units) on 2026-06-11', 'read', '2026-05-11 16:42:28'),
+(176, 1001, 66, 'Low Stock', 'HANSEL 12PCS is running low (7 left).', 'unread', '2026-05-12 02:02:11'),
+(177, 1001, 68, 'Low Stock', 'HANSEL 12PCS is running low (6 left).', 'unread', '2026-05-12 02:02:43'),
+(178, 1007, 69, 'Low Stock', 'SKYFLAKES CRACKERS 3PCS is running low (4 left).', 'unread', '2026-05-12 02:15:06'),
+(179, 1000, 70, 'Expiry Warning', 'Expiring soon: CREAM-O 3PCS [Batch #70] (3 units) on 2026-05-20', 'unread', '2026-05-12 02:23:49');
 
 -- --------------------------------------------------------
 
@@ -388,13 +392,19 @@ INSERT INTO `stock_transaction` (`transaction_id`, `product_id`, `transaction_ty
 (55, 1000, 'IN', 31, '2026-05-08 17:48:16', 248.00, 0.00, NULL, NULL),
 (56, 1000, 'IN', 1, '2026-05-08 17:50:24', 8.00, 0.00, '2026-05-29', 57),
 (57, 1000, 'ADJUSTMENT', -1, '2026-05-09 15:18:36', -8.00, 0.00, NULL, 56),
-(58, 1007, 'OUT', 1, '2026-05-11 00:38:39', 0.00, 8.00, NULL, NULL),
+(58, 1007, 'OUT', 1, '2026-05-11 00:38:39', 0.00, 8.00, NULL, 69),
 (59, 1007, 'OUT', 1, '2026-05-11 00:39:07', 0.00, 9.00, NULL, 60),
 (60, 1007, 'ADJUSTMENT', -1, '2026-05-11 16:31:23', 0.00, -9.00, NULL, 59),
 (61, 1054, 'IN', 100, '2026-05-11 16:34:11', 1375.00, 0.00, NULL, 62),
 (62, 1054, 'ADJUSTMENT', -100, '2026-05-11 16:37:13', -1375.00, -1700.00, NULL, 61),
 (63, 1000, 'OUT', 1, '2026-05-11 16:50:46', 0.00, 10.00, NULL, 64),
-(64, 1000, 'ADJUSTMENT', -1, '2026-05-11 16:51:22', 0.00, -10.00, NULL, 63);
+(64, 1000, 'ADJUSTMENT', -1, '2026-05-11 16:51:22', 0.00, -10.00, NULL, 63),
+(65, 1000, 'IN', 3, '2026-05-12 10:01:57', 24.00, 0.00, NULL, NULL),
+(66, 1001, 'IN', 4, '2026-05-12 10:02:09', 24.00, 0.00, NULL, NULL),
+(67, 1002, 'IN', 4, '2026-05-12 10:02:21', 24.80, 0.00, NULL, NULL),
+(68, 1001, 'OUT', 1, '2026-05-12 10:02:37', 0.00, 8.00, NULL, NULL),
+(69, 1007, 'ADJUSTMENT', -1, '2026-05-12 10:15:00', 0.00, -8.00, NULL, 58),
+(70, 1000, 'IN', 3, '2026-05-12 10:23:44', 24.00, 0.00, '2026-05-20', NULL);
 
 --
 -- Triggers `stock_transaction`
@@ -453,7 +463,8 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`user_id`, `username`, `password`, `role`, `email`, `reset_token`, `token_expire`) VALUES
-(1, 'RODal', '$2y$10$pg3i6ymMctnwjkK9BbTduOUi4MnpHPAzk1FlTkUQg08n10Uw3rdv2', 'owner', 'haroldsilguera497@gmail.com', NULL, NULL);
+(1, 'RODal', '$2y$10$DMbJa9TtFDvfhIawwspdBOTJMoxKTpY0vPyUyneRbvV1Xs/ZM9sRe', 'owner', 'jmcruz@kld.edu.ph', NULL, NULL),
+(2, 'SysAdmin', '$2y$10$wBYcDwjHokQgiIw5bU//rOfqhsdP4qHf6XZi/3.XU/aPOF0W9aP02', 'admin', 'cruzjeanmatthew@gmail.com', NULL, NULL);
 
 --
 -- Indexes for dumped tables
@@ -511,7 +522,7 @@ ALTER TABLE `category`
 -- AUTO_INCREMENT for table `notification`
 --
 ALTER TABLE `notification`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=176;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=180;
 
 --
 -- AUTO_INCREMENT for table `product`
@@ -523,13 +534,13 @@ ALTER TABLE `product`
 -- AUTO_INCREMENT for table `stock_transaction`
 --
 ALTER TABLE `stock_transaction`
-  MODIFY `transaction_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=65;
+  MODIFY `transaction_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=71;
 
 --
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- Constraints for dumped tables

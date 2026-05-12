@@ -278,7 +278,7 @@ while ($cat = mysqli_fetch_assoc($cat_result_modal)) {
                             $url_params .= '&category=' . urlencode($category);
                         if ($sort !== 'default')
                             $url_params .= '&sort=' . urlencode($sort); // <--- ADD THIS
-
+                        
                         ?>
                         <div class="pagination">
                             <?php if ($page > 1): ?>
@@ -383,63 +383,63 @@ while ($cat = mysqli_fetch_assoc($cat_result_modal)) {
                     </form>
                 </div>
 
-                    <table class="grid-table">
-                        <thead class="grid-thead">
-                            <tr>
-                                <th>Product Name</th>
-                                <th>Category</th>
-                                <th>Stock</th>
-                                <th>Sold</th>
-                                <th>Cost</th>
-                                <th>Price</th>
-                                <th style="text-align: center;">Quantity</th>
-                                <th>Expiry Date</th>
-                                <th style="text-align: center;">Action</th>
-                            </tr>
-                        </thead>
+                <table class="grid-table">
+                    <thead class="grid-thead">
+                        <tr>
+                            <th>Product Name</th>
+                            <th>Category</th>
+                            <th>Stock</th>
+                            <th>Sold</th>
+                            <th>Cost</th>
+                            <th>Price</th>
+                            <th style="text-align: center;">Quantity</th>
+                            <th>Expiry Date</th>
+                            <th style="text-align: center;">Action</th>
+                        </tr>
+                    </thead>
 
-                        <tbody id="productBody">
-                            <?php while ($row = mysqli_fetch_assoc($result)) {
-                                $stock = $row['total_in'] - $row['total_out'];
-                                $sold = $row['total_out'];
-                                $catAttr = strtoupper(str_replace(' ', '_', $row['category_name']));
+                    <tbody id="productBody">
+                        <?php while ($row = mysqli_fetch_assoc($result)) {
+                            $stock = $row['total_in'] - $row['total_out'];
+                            $sold = $row['total_out'];
+                            $catAttr = strtoupper(str_replace(' ', '_', $row['category_name']));
                             ?>
-                                <tr data-category="<?php echo $catAttr; ?>">
-                                    <td><?php echo htmlspecialchars($row['product_name']); ?></td>
-                                    <td><?php echo ucwords(strtolower(str_replace('_', ' ', $row['category_name']))); ?></td>
-                                    <td><?php echo $stock; ?></td>
-                                    <td><?php echo $sold; ?></td>
-                                    <td style="font-weight: bold; color: #2e7d32;">
-                                        ₱<?php echo number_format($row['cost'], 2); ?></td>
-                                    <td style="font-weight: bold; color: #2e7d32;">
-                                        ₱<?php echo number_format($row['price'], 2); ?></td>
-                                    <td>
-                                        <div class="quantity-box">
-                                            <button onclick="changeQty(this,-1)">-</button>
-                                            <input type="number" value="1" min="1" id="qty-<?php echo $row['product_id']; ?>">
-                                            <button onclick="changeQty(this,1)">+</button>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <input type="date" id="expiry-<?php echo $row['product_id']; ?>"
-                                            style="margin-top: 5px; font-size: 12px; padding: 2px;">
-                                    </td>
-                                    <td>
-                                        <div class="action-group" style="display: flex; align-items: center; gap: 8px;">
-                                            <button class="add-btn"
-                                                onclick="updateStock(<?php echo $row['product_id']; ?>, 'IN')">Add</button>
+                            <tr data-category="<?php echo $catAttr; ?>">
+                                <td><?php echo htmlspecialchars($row['product_name']); ?></td>
+                                <td><?php echo ucwords(strtolower(str_replace('_', ' ', $row['category_name']))); ?></td>
+                                <td><?php echo $stock; ?></td>
+                                <td><?php echo $sold; ?></td>
+                                <td style="font-weight: bold; color: #ff6b00;">
+                                    ₱<?php echo number_format($row['cost'], 2); ?></td>
+                                <td style="font-weight: bold; color: #2e7d32;">
+                                    ₱<?php echo number_format($row['price'], 2); ?></td>
+                                <td>
+                                    <div class="quantity-box">
+                                        <button onclick="changeQty(this,-1)">-</button>
+                                        <input type="number" value="1" min="1" id="qty-<?php echo $row['product_id']; ?>">
+                                        <button onclick="changeQty(this,1)">+</button>
+                                    </div>
+                                </td>
+                                <td>
+                                    <input type="date" id="expiry-<?php echo $row['product_id']; ?>"
+                                        style="margin-top: 5px; font-size: 12px; padding: 2px;">
+                                </td>
+                                <td>
+                                    <div class="action-group" style="display: flex; align-items: center; gap: 8px;">
+                                        <button class="add-btn"
+                                            onclick="updateStock(<?php echo $row['product_id']; ?>, 'IN')">Add</button>
 
-                                            <button class="sell-btn"
-                                                onclick="updateStock(<?php echo $row['product_id']; ?>, 'OUT', <?php echo $stock; ?>)">Sell</button>
+                                        <button class="sell-btn"
+                                            onclick="updateStock(<?php echo $row['product_id']; ?>, 'OUT', <?php echo $stock; ?>)">Sell</button>
 
-                                            <div class="action-menu-container">
-                                                <button class="action-trigger-btn"
-                                                    onclick="toggleMenu(event, <?php echo $row['product_id']; ?>)">
-                                                    <i class="fas fa-ellipsis-v"></i>
-                                                </button>
+                                        <div class="action-menu-container">
+                                            <button class="action-trigger-btn"
+                                                onclick="toggleMenu(event, <?php echo $row['product_id']; ?>)">
+                                                <i class="fas fa-ellipsis-v"></i>
+                                            </button>
 
-                                                <div id="menu-<?php echo $row['product_id']; ?>" class="dropdown-menu">
-                                                    <a href="javascript:void(0)" title="Edit" onclick="openEditModal(
+                                            <div id="menu-<?php echo $row['product_id']; ?>" class="dropdown-menu">
+                                                <a href="javascript:void(0)" title="Edit" onclick="openEditModal(
                 <?php echo $row['product_id']; ?>,
                 '<?php echo addslashes(htmlspecialchars($row['product_name'])); ?>',
                 '<?php echo addslashes(htmlspecialchars($row['product_sku'])); ?>',
@@ -447,23 +447,23 @@ while ($cat = mysqli_fetch_assoc($cat_result_modal)) {
                 <?php echo $row['cost']; ?>,
                 <?php echo $row['price']; ?>
             )">
-                                                        <i class="fas fa-pencil-alt"></i>
-                                                    </a>
+                                                    <i class="fas fa-pencil-alt"></i>
+                                                </a>
 
-                                                    <a href="javascript:void(0)" class="archive-link" title="Archive" onclick="archiveProduct(
+                                                <a href="javascript:void(0)" class="archive-link" title="Archive" onclick="archiveProduct(
                 <?php echo $row['product_id']; ?>, 
                 '<?php echo addslashes(htmlspecialchars($row['product_name'])); ?>'
             )">
-                                                        <i class="fas fa-archive"></i>
-                                                    </a>
-                                                </div>
+                                                    <i class="fas fa-archive"></i>
+                                                </a>
                                             </div>
                                         </div>
-                                    </td>
-                                </tr>
-                            <?php } ?>
-                        </tbody>
-                    </table>
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php } ?>
+                    </tbody>
+                </table>
 
             </section>
         </main>
