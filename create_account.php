@@ -1,10 +1,8 @@
 <?php
 require 'db_connect.php';
 
-
 $check_total = mysqli_query($conn, "SELECT COUNT(*) as total FROM user");
 $total_data = mysqli_fetch_assoc($check_total);
-
 
 if ($total_data['total'] >= 2) {
     header("Location: index.php");
@@ -14,22 +12,41 @@ if ($total_data['total'] >= 2) {
 $error = "";
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $_POST['username'];
-    $email = $_POST['email'];
+    $email    = $_POST['email'];
     $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-    $role = $_POST['role'];
+    $role     = $_POST['role'];
 
-
+    // Check role
     $check_role = $conn->prepare("SELECT * FROM user WHERE role = ?");
+    if (!$check_role) {
+        die("Role query error: " . $conn->error);
+    }
     $check_role->bind_param("s", $role);
     $check_role->execute();
+    $role_taken = $check_role->get_result()->num_rows > 0;
 
-    if ($check_role->get_result()->num_rows > 0) {
+    // Check email
+    $check_email = $conn->prepare("SELECT * FROM user WHERE email = ?");
+    if (!$check_email) {
+        die("Email query error: " . $conn->error);
+    }
+    $check_email->bind_param("s", $email);
+    $check_email->execute();
+    $email_taken = $check_email->get_result()->num_rows > 0;
+
+    if ($role_taken) {
         $error = "The role <strong>$role</strong> is already taken.";
+    } elseif ($email_taken) {
+        $error = "The email <strong>$email</strong> is already registered.";
     } else {
         $stmt = $conn->prepare("INSERT INTO user (username, email, password, role) VALUES (?, ?, ?, ?)");
+        if (!$stmt) {
+            die("Insert query error: " . $conn->error);
+        }
         $stmt->bind_param("ssss", $username, $email, $password, $role);
         if ($stmt->execute()) {
-            echo "<script>alert('Account created!'); window.location='index.php';</script>";
+            header("Location: index.php?registered=1");
+            exit();
         }
     }
 }
