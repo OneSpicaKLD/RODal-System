@@ -11,8 +11,13 @@ require 'db_connect.php';
 
 // 2. Capture and Sanitize All Filters
 $search = isset($_GET['search']) ? mysqli_real_escape_string($conn, trim($_GET['search'])) : '';
+
+// If category is set and not 'all', we store it. 
+// We don't cast to (int) here yet so that the 'all' string remains valid for our IF checks later.
 $category = (isset($_GET['category']) && $_GET['category'] !== 'all') ? mysqli_real_escape_string($conn, $_GET['category']) : 'all';
+
 $sort = $_GET['sort'] ?? 'newest';
+
 
 // 3. Define Audit-Proof Sorting Logic
 // We use CASE to pick the total cash value actually logged in the transaction
@@ -39,13 +44,17 @@ $limit = 10;
 $page = isset($_GET['page']) ? max(1, (int) $_GET['page']) : 1;
 $offset = ($page - 1) * $limit;
 
+
 // 5. Build Dynamic WHERE Clause
 $conditions = [];
 if (!empty($search)) {
     $conditions[] = "p.product_name LIKE '%$search%'";
 }
-if ($category !== 'all' && !empty($category)) {
-    $conditions[] = "c.category_name = '$category'";
+
+// FIXED: Changed $category_input to $category to match Step 2
+if ($category !== 'all' && is_numeric($category)) {
+    $cat_id = (int) $category;
+    $conditions[] = "p.category_id = $cat_id";
 }
 
 $whereClause = !empty($conditions) ? "WHERE " . implode(" AND ", $conditions) : "";
@@ -289,8 +298,10 @@ $result = mysqli_query($conn, $sql);
                 ?>
 
                 <form method="GET" id="filterForm" action="purchase-history.php" style="display: flex; gap: 15px;">
+                    <!-- 1. Preserve Search -->
                     <input type="hidden" name="search" value="<?php echo htmlspecialchars($search); ?>">
 
+                    <!-- 2. Sort Dropdown (Keep as is) -->
                     <div class="modern-dropdown" id="sortDropdown">
                         <div class="dropdown-trigger">
                             <span>
@@ -313,36 +324,55 @@ $result = mysqli_query($conn, $sql);
                             <li data-value="type" class="<?php echo ($sort == 'type') ? 'active' : ''; ?>">Group by Type
                             </li>
                         </ul>
-                        <input type="hidden" name="sort" value="<?php echo htmlspecialchars($sort); ?>">
+                        <input type="hidden" name="sort" id="realSortInput"
+                            value="<?php echo htmlspecialchars($sort); ?>">
                     </div>
 
+                    <!-- 3. Category Dropdown (Updated for Database IDs) -->
                     <div class="modern-dropdown" id="categoryDropdown">
                         <div class="dropdown-trigger">
                             <span id="selectedDisplay">
                                 <?php
-                                echo ($currentCat === 'all') ? 'All Categories' : str_replace('_', ' ', $currentCat);
+                                // Display logic: find the name based on the current ID
+                                $display_name = 'All Categories';
+                                if ($category !== 'all') {
+                                    $name_query = "SELECT category_name FROM category WHERE category_id = '$category' LIMIT 1";
+                                    $name_res = mysqli_query($conn, $name_query);
+                                    if ($row = mysqli_fetch_assoc($name_res)) {
+                                        $display_name = str_replace('_', ' ', $row['category_name']);
+                                    }
+                                }
+                                echo $display_name;
                                 ?>
                             </span>
                             <i class="fas fa-chevron-down"></i>
                         </div>
 
                         <ul class="dropdown-menu">
-                            <li data-value="all" class="<?php echo ($currentCat == 'all') ? 'active' : ''; ?>">All
+                            <li data-value="all" class="<?php echo ($category == 'all') ? 'active' : ''; ?>">All
                                 Categories</li>
                             <?php
-                            $cats = ["TOILETRIES", "BEVERAGE", "DRINK_POWDERED", "FOOD_CANNED", "FOOD_INSTANT", "FOOD_SNACK", "FOOD_INGREDIENT", "FOOD_RICE", "CLEANING_AGENTS"];
-                            foreach ($cats as $cat) {
-                                $isActive = ($currentCat == $cat) ? 'active' : '';
-                                $readableName = str_replace('_', ' ', $cat);
-                                echo "<li data-value='$cat' class='$isActive'>$readableName</li>";
+                            // Pull categories directly from your database
+                            $cat_sql = "SELECT category_id, category_name FROM category ORDER BY category_name ASC";
+                            $cat_res = mysqli_query($conn, $cat_sql);
+
+                            while ($row = mysqli_fetch_assoc($cat_res)) {
+                                $catId = $row['category_id'];
+                                $catName = $row['category_name'];
+                                $isActive = ($category == $catId) ? 'active' : '';
+                                $readableName = str_replace('_', ' ', $catName);
+
+                                // data-value is now the ID (e.g. 1004)
+                                echo "<li data-value='$catId' class='$isActive'>$readableName</li>";
                             }
                             ?>
                         </ul>
 
                         <input type="hidden" name="category" id="realCategoryInput"
-                            value="<?php echo htmlspecialchars($currentCat); ?>">
+                            value="<?php echo htmlspecialchars($category); ?>">
                     </div>
                 </form>
+
 
             </div>
 

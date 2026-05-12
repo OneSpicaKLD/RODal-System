@@ -9,60 +9,69 @@ if (!isset($_SESSION['isLoggedIn']) || $_SESSION['role'] !== 'admin') {
 
 require 'db_connect.php';
 
-// 2. Capture Filters (Restored to your original names)
+// 2. Capture and Sanitize All Filters
 $search = isset($_GET['search']) ? mysqli_real_escape_string($conn, trim($_GET['search'])) : '';
+
+// If category is set and not 'all', we store it. 
+// We don't cast to (int) here yet so that the 'all' string remains valid for our IF checks later.
 $category = (isset($_GET['category']) && $_GET['category'] !== 'all') ? mysqli_real_escape_string($conn, $_GET['category']) : 'all';
+
 $sort = $_GET['sort'] ?? 'newest';
 
-// 3. Define Sorting logic
-// 3. Define Sorting logic (Updated for Audit-Proof Math)
+
+// 3. Define Audit-Proof Sorting Logic
+// We use CASE to pick the total cash value actually logged in the transaction
 switch ($sort) {
     case 'oldest':
         $orderBy = "st.transaction_id ASC";
         break;
     case 'highest_val':
-        // Sorts by the total transaction value (buy_amount for IN, sell_amount for OUT)
         $orderBy = "(CASE WHEN st.transaction_type = 'IN' THEN st.buy_amount ELSE st.sell_amount END) DESC";
         break;
     case 'lowest_val':
         $orderBy = "(CASE WHEN st.transaction_type = 'IN' THEN st.buy_amount ELSE st.sell_amount END) ASC";
         break;
     case 'type':
-        // Groups by type, then by most recent date
         $orderBy = "st.transaction_type DESC, st.transaction_date DESC";
         break;
     case 'newest':
     default:
         $orderBy = "st.transaction_id DESC";
-        break;
 }
-// 4. Setup Pagination
+
+// 4. Setup Pagination Variables
 $limit = 10;
 $page = isset($_GET['page']) ? max(1, (int) $_GET['page']) : 1;
 $offset = ($page - 1) * $limit;
 
-// 5. Build WHERE Clause (Fixed the category logic)
+
+// 5. Build Dynamic WHERE Clause
 $conditions = [];
 if (!empty($search)) {
-    $conditions[] = "(p.product_name LIKE '%$search%' OR c.category_name LIKE '%$search%')";
+    $conditions[] = "p.product_name LIKE '%$search%'";
 }
-if ($category !== 'all' && !empty($category)) {
-    $conditions[] = "c.category_name = '$category'";
+
+// FIXED: Changed $category_input to $category to match Step 2
+if ($category !== 'all' && is_numeric($category)) {
+    $cat_id = (int) $category;
+    $conditions[] = "p.category_id = $cat_id";
 }
+
 $whereClause = !empty($conditions) ? "WHERE " . implode(" AND ", $conditions) : "";
 
-// 6. Get Total Count (Restored $total_pages for your pagination)
-$count_query = "SELECT COUNT(*) as total 
+// 6. Get Total Count for Pagination
+$total_query = "SELECT COUNT(*) as total 
                 FROM stock_transaction st
                 JOIN product p ON st.product_id = p.product_id
                 JOIN category c ON p.category_id = c.category_id 
                 $whereClause";
-$count_res = mysqli_query($conn, $count_query);
-$total_row_data = mysqli_fetch_assoc($count_res);
-$total_rows = $total_row_data['total'];
-$total_pages = ceil($total_rows / $limit); // <--- Fixed the Undefined Variable error
+$total_results_res = mysqli_query($conn, $total_query);
+$total_row = mysqli_fetch_assoc($total_results_res);
+$total_rows = $total_row['total'] ?? 0;
+$total_pages = ceil($total_rows / $limit);
 
-// 7. Main Transaction Query
+// 7. Main Audit-Proof Transaction Query
+// We select buy_amount and sell_amount to ensure we show what happened HISTORICALLY
 $sql = "SELECT 
             st.transaction_id, 
             st.transaction_date, 
@@ -81,7 +90,6 @@ $sql = "SELECT
         LIMIT $limit OFFSET $offset";
 
 $result = mysqli_query($conn, $sql);
-
 ?>
 
 
@@ -280,20 +288,17 @@ $result = mysqli_query($conn, $sql);
                     </div>
                 </div>
 
-
-
-
-
                 <?php
                 // Top of stocks.php
                 $search = $_GET['search'] ?? '';
                 $currentCat = $_GET['category'] ?? 'all';
                 ?>
 
-                <form method="GET" id="filterForm" action="admin_dashboard.php" style="display: flex; gap: 15px;">
+                <form method="GET" id="filterForm" action="purchase-history.php" style="display: flex; gap: 15px;">
+                    <!-- 1. Preserve Search -->
                     <input type="hidden" name="search" value="<?php echo htmlspecialchars($search); ?>">
 
-                    <!-- 1. Sort Dropdown -->
+                    <!-- 2. Sort Dropdown (Keep as is) -->
                     <div class="modern-dropdown" id="sortDropdown">
                         <div class="dropdown-trigger">
                             <span>
@@ -316,27 +321,52 @@ $result = mysqli_query($conn, $sql);
                             <li data-value="type" class="<?php echo ($sort == 'type') ? 'active' : ''; ?>">Group by Type
                             </li>
                         </ul>
-                        <input type="hidden" name="sort" value="<?php echo htmlspecialchars($sort); ?>">
+                        <input type="hidden" name="sort" id="realSortInput"
+                            value="<?php echo htmlspecialchars($sort); ?>">
                     </div>
 
-                    <!-- 2. Category Dropdown -->
+                    <!-- 3. Category Dropdown (Updated for Database IDs) -->
                     <div class="modern-dropdown" id="categoryDropdown">
                         <div class="dropdown-trigger">
-                            <span><?php echo ($category === 'all') ? 'All Categories' : str_replace('_', ' ', $category); ?></span>
+                            <span id="selectedDisplay">
+                                <?php
+                                // Display logic: find the name based on the current ID
+                                $display_name = 'All Categories';
+                                if ($category !== 'all') {
+                                    $name_query = "SELECT category_name FROM category WHERE category_id = '$category' LIMIT 1";
+                                    $name_res = mysqli_query($conn, $name_query);
+                                    if ($row = mysqli_fetch_assoc($name_res)) {
+                                        $display_name = str_replace('_', ' ', $row['category_name']);
+                                    }
+                                }
+                                echo $display_name;
+                                ?>
+                            </span>
                             <i class="fas fa-chevron-down"></i>
                         </div>
+
                         <ul class="dropdown-menu">
                             <li data-value="all" class="<?php echo ($category == 'all') ? 'active' : ''; ?>">All
                                 Categories</li>
                             <?php
-                            $cats = ["TOILETRIES", "BEVERAGE", "DRINK_POWDERED", "FOOD_CANNED", "FOOD_INSTANT", "FOOD_SNACK", "FOOD_INGREDIENT", "FOOD_RICE", "CLEANING_AGENTS"];
-                            foreach ($cats as $cat) {
-                                $isActive = ($category == $cat) ? 'active' : '';
-                                echo "<li data-value='$cat' class='$isActive'>" . str_replace('_', ' ', $cat) . "</li>";
+                            // Pull categories directly from your database
+                            $cat_sql = "SELECT category_id, category_name FROM category ORDER BY category_name ASC";
+                            $cat_res = mysqli_query($conn, $cat_sql);
+
+                            while ($row = mysqli_fetch_assoc($cat_res)) {
+                                $catId = $row['category_id'];
+                                $catName = $row['category_name'];
+                                $isActive = ($category == $catId) ? 'active' : '';
+                                $readableName = str_replace('_', ' ', $catName);
+
+                                // data-value is now the ID (e.g. 1004)
+                                echo "<li data-value='$catId' class='$isActive'>$readableName</li>";
                             }
                             ?>
                         </ul>
-                        <input type="hidden" name="category" value="<?php echo htmlspecialchars($category); ?>">
+
+                        <input type="hidden" name="category" id="realCategoryInput"
+                            value="<?php echo htmlspecialchars($category); ?>">
                     </div>
                 </form>
 
