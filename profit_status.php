@@ -26,12 +26,13 @@ $day_sql = "SELECT SUM(t.sell_amount) as rev, SUM(t.sell_amount - (p.cost * t.qu
             AND YEAR(t.transaction_date) = $selectedY";
 $day_data = mysqli_fetch_assoc(mysqli_query($conn, $day_sql));
 
-// 3. THIS WEEK (Actual last 7 days from today)
-$week_sql = "SELECT SUM(t.sell_amount) as rev, SUM(t.sell_amount - (p.cost * t.quantity)) as prof 
+// 3. SELECTED YEAR (Renamed from week for clarity)
+$year_sql = "SELECT SUM(t.sell_amount) as rev, SUM(t.sell_amount - (p.cost * t.quantity)) as prof 
              FROM stock_transaction t JOIN product p ON t.product_id = p.product_id
              WHERE t.transaction_type = 'OUT' 
-             AND t.transaction_date >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)";
-$week = mysqli_fetch_assoc(mysqli_query($conn, $week_sql));
+             AND YEAR(t.transaction_date) = $selectedY";
+$year_data_box = mysqli_fetch_assoc(mysqli_query($conn, $year_sql));
+
 
 // 4. SELECTED MONTH (Matches your Month Dropdown)
 $month_sql = "SELECT SUM(t.sell_amount) as rev, SUM(t.sell_amount - (p.cost * t.quantity)) as prof 
@@ -403,20 +404,20 @@ $year_data = mysqli_fetch_assoc(mysqli_query($conn, $year_sql));
                         </div>
 
                         <div class="yellow-box">
-                            <span>THIS WEEK</span>
-                            <strong>₱<?php echo number_format($week['rev'] ?? 0, 2); ?></strong>
-                        </div>
-
-                        <div class="yellow-box">
                             <span>SELECTED MONTH</span>
                             <!-- Use $month instead of $month_data -->
                             <strong>₱<?php echo number_format($month['rev'] ?? 0, 2); ?></strong>
                         </div>
+
+                        <div class="yellow-box">
+                            <span>SELECTED YEAR</span>
+                            <strong>₱
+                                <?php echo number_format($year_data_box['rev'] ?? 0, 2); ?>
+                            </strong>
+                        </div>
+
                     </div>
-
-
-
-
+                    
                     <!-- SECOND TITLE -->
                     <div class="section-head">
                         <h2>TOTAL PROFIT</h2>
@@ -430,26 +431,25 @@ $year_data = mysqli_fetch_assoc(mysqli_query($conn, $year_sql));
                         </div>
 
                         <div class="green-box">
-                            <span>THIS WEEK</span>
-                            <strong>₱<?php echo number_format($week['prof'] ?? 0, 2); ?></strong>
-                        </div>
-
-                        <div class="green-box">
                             <span>SELECTED MONTH</span>
                             <!-- Use $month instead of $month_data -->
                             <strong>₱<?php echo number_format($month['prof'] ?? 0, 2); ?></strong>
                         </div>
+
+                        <div class="green-box">
+                            <span>SELECTED YEAR</span>
+                            <strong>₱
+                                <?php echo number_format($year_data_box['prof'] ?? 0, 2); ?>
+                            </strong>
+                        </div>
                     </div>
-
-
-
                 </section>
 
             </div>
         </main>
     </div>
 
-   
+
 
 </body>
 
