@@ -253,8 +253,11 @@ $result = mysqli_query($conn, $sql);
                     $search_param = isset($_GET['search']) ? "&search=" . urlencode($_GET['search']) : "";
                     $cat_param = isset($_GET['category']) ? "&category=" . urlencode($_GET['category']) : "";
 
-                    // Combine them into a single string for the links
-                    $url_params = $search_param . $cat_param;
+                    // ADD THIS LINE: Capture the sort parameter
+                    $sort_param = isset($_GET['sort']) ? "&sort=" . urlencode($_GET['sort']) : "";
+
+                    // Combine all three into the string
+                    $url_params = $search_param . $cat_param . $sort_param;
                     ?>
 
                     <div class="pagination">
