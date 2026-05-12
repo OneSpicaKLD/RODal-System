@@ -239,16 +239,18 @@ $result = mysqli_query($conn, $sql);
                         <?php $url_params = !empty($search) ? '&search=' . urlencode($search) : ''; ?>
                         <div class="pagination">
                             <?php if ($page > 1): ?>
-                                <a href="?page=<?php echo ($page - 1) . $url_params; ?>">&laquo; Prev</a>
+                                <a class="nav-btn" href="?page=<?php echo ($page - 1) . $url_params; ?>">&laquo; Prev</a>
                             <?php endif; ?>
+
                             <?php for ($i = 1; $i <= $total_pages; $i++): ?>
-                                <a href="?page=<?php echo $i . $url_params; ?>"
-                                    class="<?php echo ($page == $i) ? 'active' : ''; ?>">
+                                <a class="page-num <?php echo ($page == $i) ? 'active' : ''; ?>"
+                                    href="?page=<?php echo $i . $url_params; ?>">
                                     <?php echo $i; ?>
                                 </a>
                             <?php endfor; ?>
+
                             <?php if ($page < $total_pages): ?>
-                                <a href="?page=<?php echo ($page + 1) . $url_params; ?>">Next &raquo;</a>
+                                <a class="nav-btn" href="?page=<?php echo ($page + 1) . $url_params; ?>">Next &raquo;</a>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -297,6 +299,24 @@ $result = mysqli_query($conn, $sql);
             </section>
         </main>
     </div>
+
+    <style>
+        /* Ensure the numbers behave consistently */
+        .pagination a.page-num {
+            color: #555;
+        }
+
+        /* Next/Prev Arrow Specifics - now using a class instead of position */
+        .pagination a.nav-btn {
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+            padding: 8px 20px;
+            color: #f39c12;
+            /* Keep arrows colored even when not hovered */
+        }
+    </style>
 
     <script>
         function restoreProduct(productId, productName) {

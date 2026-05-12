@@ -78,18 +78,18 @@ $result = mysqli_query($conn, $notif_sql);
 
                     <div class="pagination">
                         <?php if ($page > 1): ?>
-                            <a href="?page=<?php echo ($page - 1) . $url_params; ?>">&laquo; Prev</a>
+                            <a class="nav-btn" href="?page=<?php echo ($page - 1) . $url_params; ?>">&laquo; Prev</a>
                         <?php endif; ?>
 
                         <?php for ($i = 1; $i <= $total_pages; $i++): ?>
                             <a href="?page=<?php echo $i . $url_params; ?>"
-                                class="<?php echo ($page == $i) ? 'active' : ''; ?>">
+                                class="page-num <?php echo ($page == $i) ? 'active' : ''; ?>">
                                 <?php echo $i; ?>
                             </a>
                         <?php endfor; ?>
 
                         <?php if ($page < $total_pages): ?>
-                            <a href="?page=<?php echo ($page + 1) . $url_params; ?>">Next &raquo;</a>
+                            <a class="nav-btn" href="?page=<?php echo ($page + 1) . $url_params; ?>">Next &raquo;</a>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -102,21 +102,29 @@ $result = mysqli_query($conn, $notif_sql);
                                 <span id="notifDisplay">
                                     <?php
                                     $currentNotif = $_GET['category'] ?? '';
-                                    if ($currentNotif == 'low-stock') echo 'Low Stock';
-                                    elseif ($currentNotif == 'expiry-warning') echo 'Expiry Warning';
-                                    else echo 'All Notifications';
+                                    if ($currentNotif == 'low-stock')
+                                        echo 'Low Stock';
+                                    elseif ($currentNotif == 'expiry-warning')
+                                        echo 'Expiry Warning';
+                                    else
+                                        echo 'All Notifications';
                                     ?>
                                 </span>
                                 <i class="fas fa-chevron-down"></i>
                             </div>
 
                             <ul class="dropdown-menu">
-                                <li data-value="" class="<?php echo ($currentNotif == '') ? 'active' : ''; ?>">All Notifications</li>
-                                <li data-value="low-stock" class="<?php echo ($currentNotif == 'low-stock') ? 'active' : ''; ?>">Low Stock</li>
-                                <li data-value="expiry-warning" class="<?php echo ($currentNotif == 'expiry-warning') ? 'active' : ''; ?>">Expiry Warning</li>
+                                <li data-value="" class="<?php echo ($currentNotif == '') ? 'active' : ''; ?>">All
+                                    Notifications</li>
+                                <li data-value="low-stock"
+                                    class="<?php echo ($currentNotif == 'low-stock') ? 'active' : ''; ?>">Low Stock</li>
+                                <li data-value="expiry-warning"
+                                    class="<?php echo ($currentNotif == 'expiry-warning') ? 'active' : ''; ?>">Expiry
+                                    Warning</li>
                             </ul>
 
-                            <input type="hidden" name="category" id="realNotifInput" value="<?php echo htmlspecialchars($currentNotif); ?>">
+                            <input type="hidden" name="category" id="realNotifInput"
+                                value="<?php echo htmlspecialchars($currentNotif); ?>">
 
                             <?php if (isset($_GET['search'])): ?>
                                 <input type="hidden" name="search" value="<?php echo htmlspecialchars($_GET['search']); ?>">
@@ -157,7 +165,7 @@ $result = mysqli_query($conn, $notif_sql);
                                 $titleClass = 'text-expiry';
                                 $icon = '🚫';
                             }
-                        ?>
+                            ?>
                             <tr class="<?php echo $statusClass; ?> <?php echo $titleClass; ?>">
                                 <td class="icon-cell">
                                     <span class="status-icon"><?php echo $icon; ?></span>
@@ -451,10 +459,27 @@ $result = mysqli_query($conn, $notif_sql);
             font-size: 0.8rem;
             color: #999;
         }
+
+
+        /* Ensure the numbers behave consistently */
+        .pagination a.page-num {
+            color: #555;
+        }
+
+        /* Next/Prev Arrow Specifics - now using a class instead of position */
+        .pagination a.nav-btfn {
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+            padding: 8px 20px;
+            color: #f39c12;
+            /* Keep arrows colored even when not hovered */
+        }
     </style>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // 1. Select all modern dropdowns on the page
             const allDropdowns = document.querySelectorAll('.modern-dropdown');
 
@@ -466,7 +491,7 @@ $result = mysqli_query($conn, $notif_sql);
                 const parentForm = dropdown.closest('form');
 
                 // Toggle Open/Close
-                trigger.addEventListener('click', function(e) {
+                trigger.addEventListener('click', function (e) {
                     e.stopPropagation();
 
                     // Close any other open dropdowns first for a clean UI
@@ -479,7 +504,7 @@ $result = mysqli_query($conn, $notif_sql);
 
                 // Handle Item Selection
                 menuItems.forEach(item => {
-                    item.addEventListener('click', function() {
+                    item.addEventListener('click', function () {
                         const val = this.getAttribute('data-value');
                         const text = this.innerText;
 
@@ -513,7 +538,7 @@ $result = mysqli_query($conn, $notif_sql);
             });
 
             // Close dropdowns if user clicks anywhere else on the screen
-            window.addEventListener('click', function() {
+            window.addEventListener('click', function () {
                 allDropdowns.forEach(d => d.classList.remove('is-open'));
             });
         });

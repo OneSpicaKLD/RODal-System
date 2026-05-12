@@ -269,23 +269,22 @@ $result = mysqli_query($conn, $sql);
                     $url_params = $search_param . $cat_param . $sort_param;
                     ?>
 
-                    <div class="pagination">
-                        <!-- Previous Button -->
+                    <div class="pagination"><!-- Previous Button -->
                         <?php if ($page > 1): ?>
-                            <a href="?page=<?php echo ($page - 1) . $url_params; ?>">&laquo; Prev</a>
+                            <a class="nav-btn" href="?page=<?php echo ($page - 1) . $url_params; ?>">&laquo; Prev</a>
                         <?php endif; ?>
 
                         <!-- Page Number Links -->
                         <?php for ($i = 1; $i <= $total_pages; $i++): ?>
                             <a href="?page=<?php echo $i . $url_params; ?>"
-                                class="<?php echo ($page == $i) ? 'active' : ''; ?>">
+                                class="page-num <?php echo ($page == $i) ? 'active' : ''; ?>">
                                 <?php echo $i; ?>
                             </a>
                         <?php endfor; ?>
 
                         <!-- Next Button -->
                         <?php if ($page < $total_pages): ?>
-                            <a href="?page=<?php echo ($page + 1) . $url_params; ?>">Next &raquo;</a>
+                            <a class="nav-btn" href="?page=<?php echo ($page + 1) . $url_params; ?>">Next &raquo;</a>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -498,9 +497,26 @@ $result = mysqli_query($conn, $sql);
                         ?>
                     </tbody>
 
+
+                    <style>
+                        /* Ensure the numbers behave consistently */
+                        .pagination a.page-num {
+                            color: #555;
+                        }
+
+                        /* Next/Prev Arrow Specifics - now using a class instead of position */
+                        .pagination a.nav-btn {
+                            font-weight: 700;
+                            text-transform: uppercase;
+                            font-size: 12px;
+                            letter-spacing: 0.5px;
+                            padding: 8px 20px;
+                            color: #f39c12;
+                            /* Keep arrows colored even when not hovered */
+                        }
+                    </style>
                 </table>
             </div>
-
 
             <script>
                 document.querySelectorAll(".delete-btn").forEach(button => {
@@ -536,9 +552,12 @@ $result = mysqli_query($conn, $sql);
                 });
             </script>
 
+
         </main>
     </div>
 
 </body>
+
+
 
 </html>
