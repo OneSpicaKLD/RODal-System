@@ -144,43 +144,43 @@ $result = mysqli_query($conn, $sql);
                         </div>
 
                         <div class="user-actions">
-                        <!-- NOTIFICATION WRAPPER -->
-                        <div class="notification-container">
-                            <button class="icon-btn" id="notifBtn">
-                                <i class="fas fa-bell"></i>
-                                <span class="notif-badge" id="notifCount">0</span>
-                            </button>
+                            <!-- NOTIFICATION WRAPPER -->
+                            <div class="notification-container">
+                                <button class="icon-btn" id="notifBtn">
+                                    <i class="fas fa-bell"></i>
+                                    <span class="notif-badge" id="notifCount">0</span>
+                                </button>
 
-                            <div class="notif-dropdown" id="notifDropdown">
-                                <div class="notif-header">
-                                    <h3>Notifications</h3>
-                                    <span id="markRead" style="cursor:pointer;">Mark all as read</span>
-                                </div>
-                                <!-- This is where the separate file will inject the <li> items -->
-                                <ul class="notif-list" id="notifList"></ul>
-                                <div class="notif-footer">
-                                    <a href="all_notifications.php">View all alerts</a>
+                                <div class="notif-dropdown" id="notifDropdown">
+                                    <div class="notif-header">
+                                        <h3>Notifications</h3>
+                                        <span id="markRead" style="cursor:pointer;">Mark all as read</span>
+                                    </div>
+                                    <!-- This is where the separate file will inject the <li> items -->
+                                    <ul class="notif-list" id="notifList"></ul>
+                                    <div class="notif-footer">
+                                        <a href="all_notifications.php">View all alerts</a>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <!-- Notification Ends here... -->
+                            <!-- Notification Ends here... -->
 
-                        <!-- DROPDOWN WRAPPER -->
-                        <div class="user-profile-wrapper"
-                            style="position: relative !important; display: inline-block !important; vertical-align: middle;">
+                            <!-- DROPDOWN WRAPPER -->
+                            <div class="user-profile-wrapper"
+                                style="position: relative !important; display: inline-block !important; vertical-align: middle;">
 
-                            <button class="icon-btn" id="profileBtn" style="cursor: pointer; 
+                                <button class="icon-btn" id="profileBtn" style="cursor: pointer; 
                                 padding: 2px; 
                                 display: flex; 
                                 align-items: center; 
                                 justify-content: center; 
                                 transition: opacity 0.2s;" onmouseover="this.style.opacity='0.8'"
-                                onmouseout="this.style.opacity='1'">
-                                <i class="fas fa-user-circle"
-                                    style="font-size: 24px !important; color: #333 !important;"></i>
-                            </button>
+                                    onmouseout="this.style.opacity='1'">
+                                    <i class="fas fa-user-circle"
+                                        style="font-size: 24px !important; color: #333 !important;"></i>
+                                </button>
 
-                            <div class="notif-dropdown" id="profileDropdown" style="display: none; 
+                                <div class="notif-dropdown" id="profileDropdown" style="display: none; 
                                 position: absolute !important; 
                                 top: 40px !important; 
                                 right: 0 !important; 
@@ -193,19 +193,19 @@ $result = mysqli_query($conn, $sql);
                                 padding: 0 !important; 
                                 z-index: 99999 !important;
                                 overflow: hidden !important;">
-                                <div
-                                    style="padding: 12px 18px; border-bottom: 1px solid #f0f0f0; background: #fff; text-align: left !important;">
-                                    <strong
-                                        style="display: block !important; color: #333 !important; font-size: 14px !important; line-height: 1.2 !important; margin: 0 !important;">
-                                        <?php echo htmlspecialchars($_SESSION['username']); ?>
-                                    </strong>
-                                    <span
-                                        style="color: #888 !important; font-size: 12px !important; font-weight: normal !important;">
-                                        <?php echo htmlspecialchars(ucfirst($_SESSION['role'])); ?>
-                                    </span>
-                                </div>
+                                    <div
+                                        style="padding: 12px 18px; border-bottom: 1px solid #f0f0f0; background: #fff; text-align: left !important;">
+                                        <strong
+                                            style="display: block !important; color: #333 !important; font-size: 14px !important; line-height: 1.2 !important; margin: 0 !important;">
+                                            <?php echo htmlspecialchars($_SESSION['username']); ?>
+                                        </strong>
+                                        <span
+                                            style="color: #888 !important; font-size: 12px !important; font-weight: normal !important;">
+                                            <?php echo htmlspecialchars(ucfirst($_SESSION['role'])); ?>
+                                        </span>
+                                    </div>
 
-                                <a href="change_password.php" style="display: flex !important; 
+                                    <a href="change_password.php" style="display: flex !important; 
                   align-items: center !important; 
                   gap: 10px !important; 
                   padding: 12px 18px !important; 
@@ -219,11 +219,11 @@ $result = mysqli_query($conn, $sql);
                   white-space: nowrap !important;
                   border-bottom: 1px solid #f0f0f0 !important;
                   transition: background 0.2s;" onmouseover="this.style.backgroundColor='#fffdf0'"
-                                    onmouseout="this.style.backgroundColor='#ffffff'">
-                                    <i class="fas fa-key" style="color: #f1c40f;"></i> Change Password
-                                </a>
+                                        onmouseout="this.style.backgroundColor='#ffffff'">
+                                        <i class="fas fa-key" style="color: #f1c40f;"></i> Change Password
+                                    </a>
 
-                                <a href="logout.php" onclick="confirmLogout(event)" style="display: flex !important; 
+                                    <a href="logout.php" onclick="confirmLogout(event)" style="display: flex !important; 
                   align-items: center !important; 
                   gap: 10px !important; 
                   padding: 12px 18px !important; 
@@ -235,13 +235,13 @@ $result = mysqli_query($conn, $sql);
                   width: 100% !important;
                   white-space: nowrap !important;
                   transition: background 0.2s;" onmouseover="this.style.backgroundColor='#fff5f5'"
-                                    onmouseout="this.style.backgroundColor='#ffffff'">
-                                    <i class="fas fa-sign-out-alt"></i> Log Out
-                                </a>
+                                        onmouseout="this.style.backgroundColor='#ffffff'">
+                                        <i class="fas fa-sign-out-alt"></i> Log Out
+                                    </a>
+                                </div>
                             </div>
-                        </div>
 
-                    </div>
+                        </div>
             </header>
 
             <div class="top-bar">
@@ -252,8 +252,11 @@ $result = mysqli_query($conn, $sql);
                     $search_param = isset($_GET['search']) ? "&search=" . urlencode($_GET['search']) : "";
                     $cat_param = isset($_GET['category']) ? "&category=" . urlencode($_GET['category']) : "";
 
-                    // Combine them into a single string for the links
-                    $url_params = $search_param . $cat_param;
+                    // ADD THIS LINE: Capture the sort parameter
+                    $sort_param = isset($_GET['sort']) ? "&sort=" . urlencode($_GET['sort']) : "";
+
+                    // Combine all three into the string
+                    $url_params = $search_param . $cat_param . $sort_param;
                     ?>
 
                     <div class="pagination">
@@ -276,6 +279,7 @@ $result = mysqli_query($conn, $sql);
                         <?php endif; ?>
                     </div>
                 </div>
+
 
 
 
